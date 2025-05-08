@@ -1,7 +1,7 @@
 'use client';
 
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { motion } from 'framer-motion';
+import { useInView } from 'react-intersection-observer';
 
 export default function FadeInUp({
   children,
@@ -12,8 +12,10 @@ export default function FadeInUp({
   delay?: number;
   margin?: string;
 }) {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin });
+  const { ref, inView } = useInView({
+    rootMargin: margin,
+    triggerOnce: true,
+  });
 
   return (
     <motion.div
