@@ -3,12 +3,10 @@
 import Logo from '../../components/Logo';
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
 
   // Close sidebar when clicking outside
   useEffect(() => {
