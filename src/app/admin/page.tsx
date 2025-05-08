@@ -49,10 +49,10 @@ export default function AdminDashboard() {
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key as any)}
+            onClick={() => setActiveTab(tab.key as 'gallery' | 'services' | 'promo')}
             className={`px-4 py-2 font-medium border-b-2 transition-colors duration-200 ${activeTab === tab.key
-                ? 'border-red-600 text-red-600'
-                : 'border-transparent text-gray-500 hover:text-red-500'
+              ? 'border-red-600 text-red-600'
+              : 'border-transparent text-gray-500 hover:text-red-500'
               }`}
           >
             {tab.label}
