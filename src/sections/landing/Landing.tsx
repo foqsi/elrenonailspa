@@ -1,7 +1,6 @@
 'use client';
 
 import FadeInSection from '@/components/FadeUpSection';
-import StoreFront from '@/components/StoreFront';
 import { Element } from 'react-scroll';
 import { Hero, Features, Testimonials, About, CallToAction, Display } from './';
 
