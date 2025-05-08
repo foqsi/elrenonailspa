@@ -19,7 +19,6 @@ export default function GalleryUploader() {
     try {
       const processedBlob = await applyLogoToImage(file, logoPath, 0.25);
 
-      const fileExt = file.name.split('.').pop();
       const cleanName = file.name.replace(/\s+/g, '-').toLowerCase();
       const filePath = `gallery/${Date.now()}-${cleanName}`;
 
