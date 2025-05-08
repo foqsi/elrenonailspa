@@ -6,7 +6,9 @@ import ServicesEditor from '@/components/admin/ServicesEditor';
 import PromoBannerEditor from '@/components/admin/PromoBannerEditor';
 import GalleryManager from '@/components/admin/GalleryManager';
 
-const tabs = [
+type AdminTab = 'gallery' | 'services' | 'promo';
+
+const tabs: { key: AdminTab; label: string }[] = [
   { key: 'gallery', label: 'Gallery' },
   { key: 'services', label: 'Services' },
   { key: 'promo', label: 'Promo Banner' },
@@ -14,7 +16,7 @@ const tabs = [
 
 export default function AdminDashboard() {
   const [loggedIn, setLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'gallery' | 'services' | 'promo'>('gallery');
+  const [activeTab, setActiveTab] = useState<AdminTab>('gallery');
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
@@ -49,10 +51,10 @@ export default function AdminDashboard() {
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key as 'gallery' | 'services' | 'promo')}
+            onClick={() => setActiveTab(tab.key)}
             className={`px-4 py-2 font-medium border-b-2 transition-colors duration-200 ${activeTab === tab.key
-              ? 'border-red-600 text-red-600'
-              : 'border-transparent text-gray-500 hover:text-red-500'
+                ? 'border-red-600 text-red-600'
+                : 'border-transparent text-gray-500 hover:text-red-500'
               }`}
           >
             {tab.label}
