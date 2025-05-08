@@ -4,12 +4,13 @@ import FadeInLeft from './animations/FadeInLeft';
 import FadeInRight from './animations/FadeInRight';
 import FadeInUp from './animations/FadeInUp';
 import Image from 'next/image';
+import { StaticImageData } from 'next/image';
 
 interface ServiceCardProps {
   title: string;
   description: string;
-  image: string;
-  direction?: 'left' | 'right' | 'up';
+  image: string | StaticImageData;
+  direction?: 'left' | 'up' | 'right';
   delay?: number;
 }
 
@@ -24,13 +25,13 @@ export default function ServiceCard({
     direction === 'left'
       ? FadeInLeft
       : direction === 'right'
-      ? FadeInRight
-      : FadeInUp;
+        ? FadeInRight
+        : FadeInUp;
 
   return (
     <Wrapper delay={delay}>
       <div className="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
-        <Image  
+        <Image
           src={image}
           alt={title}
           width={400}
