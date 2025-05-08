@@ -25,25 +25,25 @@ export default function AppointmentForm() {
 
   const getAvailableTimes = () => {
     if (!form.date) return [];
-  
+
     const selectedDate = new Date(form.date + 'T00:00:00');
     const today = new Date();
     const isToday =
       selectedDate.toDateString() === today.toDateString();
-  
+
     const day = selectedDate.getDay(); // 0 = Sunday
     const startHour = day === 0 ? 12 : 10;
     const endHour = day === 0 ? 17 : 18;
-  
+
     const times: string[] = [];
-  
+
     for (let hour = startHour; hour <= endHour; hour++) {
-      for (let min of [0, 30]) {
+      for (const min of [0, 30]) {
         // Format time as HH:mm
         const h = hour.toString().padStart(2, '0');
         const m = min.toString().padStart(2, '0');
         const timeStr = `${h}:${m}`;
-  
+
         // If today, skip times that already passed
         if (isToday) {
           const now = new Date();
@@ -51,29 +51,29 @@ export default function AppointmentForm() {
           candidate.setHours(hour, min, 0, 0);
           if (candidate <= now) continue;
         }
-  
+
         // Add valid time
         times.push(timeStr);
       }
     }
-  
+
     return times;
   };
-  
+
   const formatTime = (time: string) => {
     const [hour, minute] = time.split(':').map(Number);
     const ampm = hour >= 12 ? 'PM' : 'AM';
     const h = hour % 12 === 0 ? 12 : hour % 12;
     return `${h}:${minute.toString().padStart(2, '0')} ${ampm}`;
-  };  
+  };
 
   const capitalize = (s: string) =>
-    s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();  
+    s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
-  
+
     const templateParams = {
       firstName: capitalize(form.firstName),
       lastName: capitalize(form.lastName),
@@ -84,7 +84,7 @@ export default function AppointmentForm() {
       date: form.date,
       time: formatTime(form.time),
     };
-    
+
     try {
       await emailjs.send(
         'service_oc3tvfe',
@@ -107,9 +107,9 @@ export default function AppointmentForm() {
       console.error('EmailJS Error:', error);
       alert('Failed to send. Please try again later.');
     }
-  
+
     setSubmitting(false);
-  };  
+  };
 
   return (
     <main className="min-h-screen pt-24 px-4 bg-gray-50">
@@ -119,7 +119,7 @@ export default function AppointmentForm() {
 
       <div className="max-w-xl mx-auto bg-white p-8 shadow-lg rounded-lg">
         <form className="space-y-6" onSubmit={handleSubmit}>
-        <p className="text-sm text-gray-500 mb-2 text-center">Fields marked with <span className="text-red-500">*</span> are required.</p>
+          <p className="text-sm text-gray-500 mb-2 text-center">Fields marked with <span className="text-red-500">*</span> are required.</p>
           {/* Name Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
