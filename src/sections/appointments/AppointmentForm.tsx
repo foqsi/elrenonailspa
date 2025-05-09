@@ -20,8 +20,25 @@ export default function AppointmentForm() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setForm((prev) => ({ ...prev, [name]: value }));
+
+    if (name === 'phone') {
+      // Strip all non-digits
+      const digits = value.replace(/\D/g, '');
+
+      // Format to (XXX) XXX-XXXX
+      let formatted = digits;
+      if (digits.length > 3 && digits.length <= 6) {
+        formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+      } else if (digits.length > 6) {
+        formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+      }
+
+      setForm((prev) => ({ ...prev, [name]: formatted }));
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
   };
+
 
   const getAvailableTimes = () => {
     if (!form.date) return [];
@@ -164,8 +181,17 @@ export default function AppointmentForm() {
               name="phone"
               value={form.phone}
               onChange={handleChange}
+              onInvalid={(e) =>
+                e.currentTarget.setCustomValidity(
+                  'Please enter a 10-digit phone number in the format (405) 555-6655.'
+                )
+              }
+              onInput={(e) => e.currentTarget.setCustomValidity('')}
               className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+              pattern="^\\(\\d{3}\\) \\d{3}-\\d{4}$"
+              maxLength={14}
               required
+              placeholder="(405) 555-6655"
             />
           </div>
 
@@ -205,7 +231,7 @@ export default function AppointmentForm() {
 
           {/* Tech & Message */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Tech <span className="text-gray-400 text-sm">(optional)</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Tech</label>
             <input
               type="text"
               name="tech"
