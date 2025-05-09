@@ -103,7 +103,7 @@ function NavLinks({ onClick }: { onClick?: () => void }) {
       <Link href="/" className={linkClass} onClick={onClick}>Home</Link>
       <Link href="/services" className={linkClass} onClick={onClick}>Services</Link>
       <Link href="/gallery" className={linkClass} onClick={onClick}>Gallery</Link>
-      <Link href="/appointments" className={linkClass} onClick={onClick}>Appointments</Link>
+      <Link href="/appointment" className={linkClass} onClick={onClick}>Appointments</Link>
       <Link href="/contact" className={linkClass} onClick={onClick}>Contact</Link>
     </>
   );
