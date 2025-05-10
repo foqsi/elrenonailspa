@@ -4,3 +4,4 @@ export { default as Testimonials } from './Testimonials';
 export { default as About } from './About';
 export { default as CallToAction } from './CallToAction';
 export { default as Display } from './Display';
+export { default as Environment } from './Environment';

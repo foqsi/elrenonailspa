@@ -18,35 +18,33 @@ export default function AppointmentForm() {
 
   const [submitting, setSubmitting] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+  ) => {
     const { name, value } = e.target;
 
     if (name === 'phone') {
-      // Strip all non-digits
-      const digits = value.replace(/\D/g, '');
+      const digits = value.replace(/\D/g, '').slice(0, 10); // max 10 digits
 
-      // Format to (XXX) XXX-XXXX
       let formatted = digits;
       if (digits.length > 3 && digits.length <= 6) {
         formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
       } else if (digits.length > 6) {
-        formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+        formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
       }
 
-      setForm((prev) => ({ ...prev, [name]: formatted }));
+      setForm((prev) => ({ ...prev, phone: formatted }));
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
-
 
   const getAvailableTimes = () => {
     if (!form.date) return [];
 
     const selectedDate = new Date(form.date + 'T00:00:00');
     const today = new Date();
-    const isToday =
-      selectedDate.toDateString() === today.toDateString();
+    const isToday = selectedDate.toDateString() === today.toDateString();
 
     const day = selectedDate.getDay(); // 0 = Sunday
     const startHour = day === 0 ? 12 : 10;
@@ -56,12 +54,10 @@ export default function AppointmentForm() {
 
     for (let hour = startHour; hour <= endHour; hour++) {
       for (const min of [0, 30]) {
-        // Format time as HH:mm
         const h = hour.toString().padStart(2, '0');
         const m = min.toString().padStart(2, '0');
         const timeStr = `${h}:${m}`;
 
-        // If today, skip times that already passed
         if (isToday) {
           const now = new Date();
           const candidate = new Date();
@@ -69,7 +65,6 @@ export default function AppointmentForm() {
           if (candidate <= now) continue;
         }
 
-        // Add valid time
         times.push(timeStr);
       }
     }
@@ -84,18 +79,24 @@ export default function AppointmentForm() {
     return `${h}:${minute.toString().padStart(2, '0')} ${ampm}`;
   };
 
-  const capitalize = (s: string) =>
-    s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
+  const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1).toLowerCase();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
 
+    const phoneDigits = form.phone.replace(/\D/g, '');
+    if (phoneDigits.length !== 10) {
+      alert('Please enter a valid 10-digit phone number.');
+      setSubmitting(false);
+      return;
+    }
+
     const templateParams = {
       firstName: capitalize(form.firstName),
       lastName: capitalize(form.lastName),
       email: form.email,
-      phone: form.phone,
+      phone: phoneDigits, // or form.phone to include formatting
       tech: capitalize(form.tech),
       message: form.message,
       date: form.date,
@@ -136,11 +137,16 @@ export default function AppointmentForm() {
 
       <div className="max-w-xl mx-auto bg-white p-8 shadow-lg rounded-lg">
         <form className="space-y-6" onSubmit={handleSubmit}>
-          <p className="text-sm text-gray-500 mb-2 text-center">Fields marked with <span className="text-red-500">*</span> are required.</p>
+          <p className="text-sm text-gray-500 mb-2 text-center">
+            Fields marked with <span className="text-red-500">*</span> are required.
+          </p>
+
           {/* Name Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">First Name <span className='text-red-500'>*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                First Name <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 name="firstName"
@@ -151,7 +157,9 @@ export default function AppointmentForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Last Name <span className='text-red-500'>*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Last Name <span className="text-red-500">*</span>
+              </label>
               <input
                 type="text"
                 name="lastName"
@@ -175,20 +183,15 @@ export default function AppointmentForm() {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Phone <span className='text-red-500'>*</span></label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Phone <span className="text-red-500">*</span>
+            </label>
             <input
               type="tel"
               name="phone"
               value={form.phone}
               onChange={handleChange}
-              onInvalid={(e) =>
-                e.currentTarget.setCustomValidity(
-                  'Please enter a 10-digit phone number in the format (405) 555-6655.'
-                )
-              }
-              onInput={(e) => e.currentTarget.setCustomValidity('')}
               className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
-              pattern="^\\(\\d{3}\\) \\d{3}-\\d{4}$"
               maxLength={14}
               required
               placeholder="(405) 555-6655"
@@ -198,7 +201,9 @@ export default function AppointmentForm() {
           {/* Date & Time */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Date <span className='text-red-500'>*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Preferred Date <span className="text-red-500">*</span>
+              </label>
               <input
                 type="date"
                 name="date"
@@ -210,7 +215,9 @@ export default function AppointmentForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Time <span className='text-red-500'>*</span></label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Preferred Time <span className="text-red-500">*</span>
+              </label>
               <select
                 name="time"
                 value={form.time}
@@ -231,7 +238,9 @@ export default function AppointmentForm() {
 
           {/* Tech & Message */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Preferred Tech</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">
+              Preferred Tech <span className="text-gray-400 text-sm">(optional)</span>
+            </label>
             <input
               type="text"
               name="tech"
