@@ -16,6 +16,7 @@ export default function AppointmentForm() {
     time: '',
   });
 
+  const [phoneError, setPhoneError] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (
@@ -24,8 +25,7 @@ export default function AppointmentForm() {
     const { name, value } = e.target;
 
     if (name === 'phone') {
-      const digits = value.replace(/\D/g, '').slice(0, 10); // max 10 digits
-
+      const digits = value.replace(/\D/g, '').slice(0, 10);
       let formatted = digits;
       if (digits.length > 3 && digits.length <= 6) {
         formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
@@ -34,10 +34,12 @@ export default function AppointmentForm() {
       }
 
       setForm((prev) => ({ ...prev, phone: formatted }));
+      setPhoneError(digits.length === 10 ? '' : 'Please enter a valid 10-digit phone number.');
     } else {
       setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
+
 
   const getAvailableTimes = () => {
     if (!form.date) return [];
@@ -87,16 +89,18 @@ export default function AppointmentForm() {
 
     const phoneDigits = form.phone.replace(/\D/g, '');
     if (phoneDigits.length !== 10) {
-      alert('Please enter a valid 10-digit phone number.');
+      setPhoneError('Please enter a valid 10-digit phone number.');
       setSubmitting(false);
       return;
+    } else {
+      setPhoneError('');
     }
 
     const templateParams = {
       firstName: capitalize(form.firstName),
       lastName: capitalize(form.lastName),
-      email: form.email,
-      phone: phoneDigits, // or form.phone to include formatting
+      email: form.email || 'N/A',
+      phone: phoneDigits,
       tech: capitalize(form.tech),
       message: form.message,
       date: form.date,
@@ -104,12 +108,24 @@ export default function AppointmentForm() {
     };
 
     try {
+      // Always send internal notification to salon
       await emailjs.send(
         'service_oc3tvfe',
         'template_uhpnfar',
         templateParams,
         'xTe_0sirIJPRptXcd'
       );
+
+      // Conditionally send confirmation to client
+      if (form.email) {
+        await emailjs.send(
+          'service_oc3tvfe',
+          'template_ywly2ji',
+          templateParams,
+          'xTe_0sirIJPRptXcd'
+        );
+      }
+
       alert('Appointment request sent!');
       setForm({
         firstName: '',
@@ -128,6 +144,7 @@ export default function AppointmentForm() {
 
     setSubmitting(false);
   };
+
 
   return (
     <main className="min-h-screen pt-24 px-4 bg-gray-50">
@@ -191,11 +208,16 @@ export default function AppointmentForm() {
               name="phone"
               value={form.phone}
               onChange={handleChange}
-              className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+              className={`w-full border ${phoneError ? 'border-red-500' : 'border-gray-300'
+                } p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300`}
               maxLength={14}
               required
               placeholder="(405) 555-6655"
             />
+            {phoneError && (
+              <p className="text-sm text-red-500 mt-1">{phoneError}</p>
+            )}
+
           </div>
 
           {/* Date & Time */}
