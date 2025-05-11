@@ -24,6 +24,13 @@ export default function Footer() {
               </a>
             </p>
           </div>
+          <div className="mt-6 text-sm text-gray-300">
+            <h4 className="font-semibold mb-2">Business Hours</h4>
+            <ul className="space-y-1">
+              <li>Sunday: 12:00 PM – 6:00 PM</li>
+              <li>Monday – Saturday: 10:00 AM – 7:00 PM</li>
+            </ul>
+          </div>
         </div>
 
         {/* Navigation */}
