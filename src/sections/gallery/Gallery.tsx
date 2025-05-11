@@ -7,7 +7,6 @@ import FadeInLeft from '@/components/animations/FadeInLeft';
 import FadeInRight from '@/components/animations/FadeInRight';
 import FadeInDown from '@/components/animations/FadeInDown';
 
-
 interface GalleryItem {
   id: number;
   image_url: string;
@@ -57,34 +56,40 @@ export default function GallerySection() {
           </h1>
         </FadeInDown>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-        {images.map((item, index) => {
-          let Wrapper;
+          {images.map((item, index) => {
+            let Wrapper;
 
-          if (index % 3 === 0) Wrapper = FadeInLeft;
-          else if (index % 3 === 2) Wrapper = FadeInRight;
-          else Wrapper = FadeIn;
+            if (index % 3 === 0) Wrapper = FadeInLeft;
+            else if (index % 3 === 2) Wrapper = FadeInRight;
+            else Wrapper = FadeIn;
 
-          return (
-            <Wrapper key={item.id} delay={index * 0.1}>
-              <div
-                className="rounded-lg shadow-md overflow-hidden cursor-pointer bg-white"
-                onClick={() => openModal(index)}
-              >
-                <img
-                  src={item.image_url}
-                  alt={item.caption ?? 'Gallery image'}
-                  className="w-full max-h-[500px] object-contain bg-gray-100"
-                />
-                {item.caption && (
-                  <div className="p-4 text-gray-700 text-center text-sm">
-                    {item.caption}
-                  </div>
-                )}
-              </div>
-            </Wrapper>
-          );
-        })}
+            return (
+              <Wrapper key={item.id} delay={index * 0.1}>
+                <div
+                  className="rounded-lg shadow-md overflow-hidden cursor-pointer bg-white"
+                  onClick={() => openModal(index)}
+                >
+                  <img
+                    src={item.image_url}
+                    alt={item.caption ?? 'Gallery image'}
+                    className="w-full max-h-[500px] object-contain bg-gray-100"
+                    onContextMenu={(e) => e.preventDefault()}
+                  />
+                  {item.caption && (
+                    <div className="p-4 text-gray-700 text-center text-sm">
+                      {item.caption}
+                    </div>
+                  )}
+                </div>
+              </Wrapper>
+            );
+          })}
         </div>
+        <p className="text-center text-sm text-gray-500 mt-10 max-w-2xl mx-auto">
+          <em>
+            All photos shown are real work completed by <strong>El Reno Nail Spa</strong>. These images are protected by copyright and must not be used, copied, or displayed anywhere else without permission.
+          </em>
+        </p>
       </div>
 
       {/* Modal */}
@@ -107,6 +112,7 @@ export default function GallerySection() {
               src={images[activeIndex].image_url}
               alt={images[activeIndex].caption ?? ''}
               className="w-full max-h-[80vh] object-contain rounded"
+              onContextMenu={(e) => e.preventDefault()}
             />
             {images[activeIndex].caption && (
               <div className="text-white text-center mt-4 text-sm">
