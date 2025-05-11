@@ -107,40 +107,39 @@ export default function AppointmentForm() {
       time: formatTime(form.time),
     };
 
-    try {
-      // Always send internal notification to salon
+    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
+
+    if (isValidEmail) {
+      // Send confirmation to customer
+      await emailjs.send(
+        'service_oc3tvfe',
+        'template_ywly2ji',
+        templateParams,
+        'xTe_0sirIJPRptXcd'
+      );
+    } else {
+      // Send internal notification to salon only if no valid email
       await emailjs.send(
         'service_oc3tvfe',
         'template_uhpnfar',
         templateParams,
         'xTe_0sirIJPRptXcd'
       );
-
-      // Conditionally send confirmation to client
-      if (form.email) {
-        await emailjs.send(
-          'service_oc3tvfe',
-          'template_ywly2ji',
-          templateParams,
-          'xTe_0sirIJPRptXcd'
-        );
-      }
-
-      alert('Appointment request sent!');
-      setForm({
-        firstName: '',
-        lastName: '',
-        email: '',
-        phone: '',
-        tech: '',
-        message: '',
-        date: '',
-        time: '',
-      });
-    } catch (error) {
-      console.error('EmailJS Error:', error);
-      alert('Failed to send. Please try again later.');
     }
+
+
+    alert('Appointment request sent!');
+    setForm({
+      firstName: '',
+      lastName: '',
+      email: '',
+      phone: '',
+      tech: '',
+      message: '',
+      date: '',
+      time: '',
+    });
+
 
     setSubmitting(false);
   };
