@@ -72,6 +72,7 @@ export default function GallerySection() {
                   <img
                     src={item.image_url}
                     alt={item.caption ?? 'Gallery image'}
+                    title="Work by El Reno Nail Spa"
                     className="w-full max-h-[500px] object-contain bg-gray-100"
                     onContextMenu={(e) => e.preventDefault()}
                   />
