@@ -6,6 +6,7 @@ import FadeIn from '@/components/animations/FadeIn';
 import FadeInLeft from '@/components/animations/FadeInLeft';
 import FadeInRight from '@/components/animations/FadeInRight';
 import FadeInDown from '@/components/animations/FadeInDown';
+import Throbber from '@/components/Throbber';
 
 interface GalleryItem {
   id: number;
@@ -45,7 +46,13 @@ export default function GallerySection() {
       prev !== null ? (prev - 1 + images.length) % images.length : null
     );
 
-  if (loading) return <p className="text-center py-20">Loading gallery...</p>;
+  if (loading) {
+    return (
+      <div className='min-h-screen flex items-center justify-center'>
+        <Throbber size={48} />
+      </div>
+    );
+  }
 
   return (
     <section className="py-16 bg-white">

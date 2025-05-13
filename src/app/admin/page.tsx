@@ -5,6 +5,7 @@ import GalleryUploader from '@/components/admin/GalleryUploader';
 import ServicesEditor from '@/components/admin/ServicesEditor';
 import PromoBannerEditor from '@/components/admin/PromoBannerEditor';
 import GalleryManager from '@/components/admin/GalleryManager';
+import Throbber from '@/components/Throbber';
 
 type AdminTab = 'gallery' | 'services' | 'promo';
 
@@ -24,15 +25,33 @@ export default function AdminDashboard() {
       window.location.href = '/login';
     } else {
       setLoggedIn(true);
+
+      const savedTab = localStorage.getItem('adminTab') as AdminTab;
+      if (savedTab && tabs.some((tab) => tab.key === savedTab)) {
+        setActiveTab(savedTab);
+      }
     }
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem('adminLoggedIn');
+    localStorage.removeItem('adminTab');
     window.location.href = '/login';
   };
 
-  if (!loggedIn) return null;
+  const handleTabChange = (tabKey: AdminTab) => {
+    setActiveTab(tabKey);
+    localStorage.setItem('adminTab', tabKey);
+  };
+
+  if (!loggedIn) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <Throbber size={48} />
+      </div>
+    );
+  }
+
 
   return (
     <main className="min-h-screen pt-20 px-4 max-w-5xl mx-auto">
@@ -51,10 +70,10 @@ export default function AdminDashboard() {
         {tabs.map((tab) => (
           <button
             key={tab.key}
-            onClick={() => setActiveTab(tab.key)}
+            onClick={() => handleTabChange(tab.key)}
             className={`px-4 py-2 font-medium border-b-2 transition-colors duration-200 ${activeTab === tab.key
-                ? 'border-red-600 text-red-600'
-                : 'border-transparent text-gray-500 hover:text-red-500'
+              ? 'border-red-600 text-red-600'
+              : 'border-transparent text-gray-500 hover:text-red-500'
               }`}
           >
             {tab.label}

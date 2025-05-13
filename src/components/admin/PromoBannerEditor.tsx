@@ -70,6 +70,7 @@ export default function PromoBannerEditor() {
 
       <div className="bg-white p-6 rounded shadow-md">
         <h3 className="text-lg font-bold mb-4">All Promo Banners</h3>
+        <p className='text-md font-bold text-gray-500'><span className='text-lg font-bold text-red-600'>*** </span>If you want to change the order, simply click save to move one to the top and refresh the page.</p>
         {loading ? (
           <p>Loading...</p>
         ) : banners.length === 0 ? (
