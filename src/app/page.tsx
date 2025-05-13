@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   keywords: ['nail spa', 'El Reno', 'manicure', 'pedicure', 'nail art'],
   openGraph: {
     title: 'El Reno Nail Spa',
-    description: 'Real nail art and spa treatments in El Reno.',
+    description: 'Nail Perfection, Every Time! Walk-ins & Appointments are welcome!',
     url: 'https://elrenonailspa.com',
     siteName: 'El Reno Nail Spa',
     images: [
