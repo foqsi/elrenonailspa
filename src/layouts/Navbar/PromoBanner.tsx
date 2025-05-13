@@ -26,13 +26,21 @@ export default function PromoBanner() {
     fetchPromos();
   }, []);
 
-  if (!promos.length) return null;
+  if (!promos.length) {
+    return (
+      <div className="w-full bg-red-600 text-white py-2 fixed z-[60]">
+        <div className="flex justify-center">
+          <span className="text-xl animate-pulse">Loading promo...</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full bg-red-600 text-white overflow-hidden fixed z-[60]">
-      <div className="animate-marquee flex py-2 md:text-base font-semibold whitespace-nowrap">
-        {promos.map((promo) => (
-          <span key={promo.id} className="mx-8 text-xl">
+      <div className="animate-marquee flex whitespace-nowrap font-semibold">
+        {[...promos, ...promos].map((promo, index) => (
+          <span key={`${promo.id}-${index}`} className="mx-8 text-xl">
             {promo.text}
           </span>
         ))}

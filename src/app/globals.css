@@ -28,18 +28,23 @@ body {
   font-family: Arial, Helvetica, sans-serif;
 }
 
-
+/* BANNER */
 @keyframes marquee {
   0% {
     transform: translateX(100%);
   }
+
   100% {
     transform: translateX(-100%);
   }
 }
 
 .animate-marquee {
-  display: inline-block;
-  white-space: nowrap;
   animation: marquee 30s linear infinite;
+}
+
+@media (max-width: 768px) {
+  .animate-marquee {
+    animation-duration: 15s;
+  }
 }
