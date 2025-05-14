@@ -5,7 +5,8 @@ export async function POST(req: Request) {
 
   console.log('📥 Backend received:', body);
 
-  const { id: _id, ...safeBody } = body;
+  delete body.id;
+  const safeBody = body;
 
   console.log('🧼 Inserting (safeBody):', safeBody);
 
