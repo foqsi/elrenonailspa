@@ -1,6 +1,7 @@
 import { Metadata } from 'next';
 import './globals.css';
 import { Navbar, Footer, PromoBanner } from '@/layouts';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata: Metadata = {
   title: {
@@ -45,6 +46,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <div className="pt-24">
           <PromoBanner />
         </div>
+
+        {/* ✅ Add the toaster here */}
+        <Toaster position="bottom-center" />
+
         {children}
         <Footer />
       </body>

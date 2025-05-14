@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import toast from 'react-hot-toast';
 
 interface Category {
   id: number;
@@ -16,7 +17,6 @@ interface Service {
   category_id: number;
   price_modifier?: boolean;
 }
-
 
 export default function ServicesEditor() {
   const [categories, setCategories] = useState<Category[]>([]);
@@ -38,27 +38,76 @@ export default function ServicesEditor() {
   }
 
   async function handleAddService() {
-    if (!newService.name || !newService.price || !newService.category_id) return;
-
-    const { error } = await supabase.from('services').insert([newService]);
-    if (!error) {
-      setNewService({});
-      fetchServicesAndCategories();
+    if (!newService.name || !newService.price || !newService.category_id) {
+      toast.error('Please complete all required fields.');
+      return;
     }
+
+    const safeService = {
+      name: newService.name,
+      description: newService.description ?? null,
+      price: newService.price,
+      category_id: newService.category_id,
+      price_modifier: newService.price_modifier ?? false,
+    };
+
+    console.log('Adding service:', safeService);
+
+    const res = await fetch('/api/admin/services/add', {
+      method: 'POST',
+      body: JSON.stringify(safeService),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Add failed:', err);
+      toast.error('Failed to add service.');
+      return;
+    }
+
+    toast.success('Service added!');
+    setNewService({});
+    fetchServicesAndCategories();
   }
 
-  async function handleUpdateService(updated: Service) {
-    const { error } = await supabase
-      .from('services')
-      .update(updated)
-      .eq('id', updated.id);
 
-    if (!error) fetchServicesAndCategories();
+  async function handleUpdateService(updated: Service) {
+    const res = await fetch('/api/admin/services/update', {
+      method: 'POST',
+      body: JSON.stringify(updated),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('Update failed:', errorText);
+      toast.error('Failed to update service.');
+      return;
+    }
+
+    toast.success('Service updated!');
+    fetchServicesAndCategories();
   }
 
   async function handleDeleteService(id: number) {
-    const { error } = await supabase.from('services').delete().eq('id', id);
-    if (!error) fetchServicesAndCategories();
+    const res = await fetch('/api/admin/services/delete', {
+      method: 'POST',
+      body: JSON.stringify({ id }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) {
+      const errorText = await res.text();
+      console.error('Delete failed:', errorText);
+      toast.error('Failed to delete service.');
+      return;
+    }
+
+    toast.success('Service deleted.');
+    fetchServicesAndCategories();
   }
 
   const servicesByCategory = categories.map((cat) => ({
@@ -118,11 +167,10 @@ export default function ServicesEditor() {
                   price_modifier: e.target.checked,
                 })
               }
-
             />
           </div>
-
         </div>
+
         <textarea
           placeholder="Description"
           className="mt-4 border p-2 rounded w-full"
@@ -131,6 +179,7 @@ export default function ServicesEditor() {
             setNewService({ ...newService, description: e.target.value })
           }
         ></textarea>
+
         <button
           onClick={handleAddService}
           className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"

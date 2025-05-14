@@ -12,7 +12,6 @@ interface Service {
   price_modifier?: string | null;
 }
 
-
 interface Category {
   id: number;
   name: string;
@@ -30,13 +29,11 @@ async function getServices(): Promise<{ categories: Category[]; services: Servic
     .select('id, name, description, price, price_modifier, category_id')
     .order('category_id');
 
-  // Explicitly type the arrays so TypeScript uses the interfaces
   const categories: Category[] = categoriesRaw ?? [];
   const services: Service[] = servicesRaw ?? [];
 
   return { categories, services };
 }
-
 
 export default async function ServicesPage() {
   const { categories, services } = await getServices();
@@ -47,7 +44,6 @@ export default async function ServicesPage() {
       .filter((s) => s.category_id === cat.id)
       .sort((a, b) => a.price - b.price),
   }));
-
 
   return (
     <main className="max-w-4xl mx-auto px-4 py-20">

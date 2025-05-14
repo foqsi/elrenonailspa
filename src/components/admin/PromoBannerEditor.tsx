@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import toast from 'react-hot-toast';
 
 interface PromoBanner {
   id: string;
@@ -26,23 +27,65 @@ export default function PromoBannerEditor() {
   }
 
   async function updateBanner(updated: PromoBanner) {
-    await supabase
-      .from('promo_banner')
-      .update({ text: updated.text, enabled: updated.enabled, updated_at: new Date() })
-      .eq('id', updated.id);
+    const res = await fetch('/api/admin/promo/update', {
+      method: 'POST',
+      body: JSON.stringify({
+        id: updated.id,
+        text: updated.text,
+        enabled: updated.enabled,
+      }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Update failed:', err);
+      toast.error('Failed to update banner.');
+      return;
+    }
+
+    toast.success('Banner updated!');
     fetchBanners();
   }
 
   async function deleteBanner(id: string) {
-    await supabase.from('promo_banner').delete().eq('id', id);
+    const res = await fetch('/api/admin/promo/delete', {
+      method: 'POST',
+      body: JSON.stringify({ id }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Delete failed:', err);
+      toast.error('Failed to delete banner.');
+      return;
+    }
+
+    toast.success('Banner deleted.');
     fetchBanners();
   }
 
   async function createBanner() {
-    if (!newText.trim()) return;
-    await supabase
-      .from('promo_banner')
-      .insert([{ text: newText, enabled: false }]);
+    if (!newText.trim()) {
+      toast.error('Enter a banner message first.');
+      return;
+    }
+
+    const res = await fetch('/api/admin/promo/create', {
+      method: 'POST',
+      body: JSON.stringify({ text: newText }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('Create failed:', err);
+      toast.error('Failed to create banner.');
+      return;
+    }
+
+    toast.success('Banner created!');
     setNewText('');
     fetchBanners();
   }
@@ -70,7 +113,11 @@ export default function PromoBannerEditor() {
 
       <div className="bg-white p-6 rounded shadow-md">
         <h3 className="text-lg font-bold mb-4">All Promo Banners</h3>
-        <p className='text-md font-bold text-gray-500'><span className='text-lg font-bold text-red-600'>*** </span>If you want to change the order, simply click save to move one to the top and refresh the page.</p>
+        <p className='text-md font-bold text-gray-500'>
+          <span className='text-lg font-bold text-red-600'>*** </span>
+          If you want to change the order, simply click save to move one to the top and refresh the page.
+        </p>
+
         {loading ? (
           <p>Loading...</p>
         ) : banners.length === 0 ? (
