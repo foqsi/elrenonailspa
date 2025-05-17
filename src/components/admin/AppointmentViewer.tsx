@@ -12,18 +12,20 @@ interface Appointment {
   time: string;
   phone: string;
   tech: string;
+  message: string | null;
 }
 
 export default function AppointmentsViewer() {
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [loading, setLoading] = useState(true);
   const [confirmId, setConfirmId] = useState<string | null>(null);
+  const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
 
   const fetchAppointments = async () => {
     setLoading(true);
     const { data, error } = await supabase
       .from('appointments')
-      .select('id, first_name, last_name, date, time, phone, tech')
+      .select('id, first_name, last_name, date, time, phone, tech, message')
       .order('date', { ascending: true })
       .order('time', { ascending: true });
 
@@ -35,10 +37,10 @@ export default function AppointmentsViewer() {
       const upcoming = (data ?? []).filter((appt) => appt.date >= today);
       setAppointments(upcoming);
     }
+    console.log('Fetched appointments:', data);
 
     setLoading(false);
   };
-
 
   useEffect(() => {
     fetchAppointments();
@@ -65,17 +67,26 @@ export default function AppointmentsViewer() {
     setConfirmId(null);
   };
 
-
   const groupedByDate = appointments.reduce<Record<string, Appointment[]>>((acc, appt) => {
     if (!acc[appt.date]) acc[appt.date] = [];
     acc[appt.date].push(appt);
     return acc;
   }, {});
 
+  const toggleRowExpansion = (id: string) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else {
+        next.add(id);
+      }
+      return next;
+    });
+  };
+
   return (
     <div className="space-y-12 relative">
-      <h2 className="text-xl font-semibold text-red-600">All Appointments</h2>
-
       {loading ? (
         <p className="text-gray-500">Loading...</p>
       ) : appointments.length === 0 ? (
@@ -93,6 +104,7 @@ export default function AppointmentsViewer() {
                     <th className="p-2 border">Name</th>
                     <th className="p-2 border">Phone</th>
                     <th className="p-2 border">Tech</th>
+                    <th className="p-2 border">Message</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -117,6 +129,28 @@ export default function AppointmentsViewer() {
                         </a>
                       </td>
                       <td className="p-2 border">{appt.tech}</td>
+                      <td className="p-2 border text-sm text-gray-700 break-words whitespace-pre-wrap max-w-md">
+                        {appt.message ? (
+                          <>
+                            {expandedRows.has(appt.id)
+                              ? appt.message
+                              : appt.message.length > 80
+                                ? `${appt.message.slice(0, 80)}...`
+                                : appt.message}
+                            {appt.message.length > 80 && (
+                              <button
+                                onClick={() => toggleRowExpansion(appt.id)}
+                                className="ml-2 text-blue-600 underline text-xs"
+                              >
+                                {expandedRows.has(appt.id) ? 'Show less' : 'Show more'}
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <span className="italic text-gray-400">No message</span>
+                        )}
+                      </td>
+
                     </tr>
                   ))}
                 </tbody>
