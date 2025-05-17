@@ -1,3 +1,5 @@
+export const dynamic = 'force-dynamic';
+
 import { supabase } from '@/lib/supabaseClient';
 import FadeInDown from '@/components/animations/FadeInDown';
 import FadeInUp from '@/components/animations/FadeInUp';
