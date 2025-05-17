@@ -1,4 +1,5 @@
 import AppointmentForm from '@/sections/appointments/AppointmentForm';
+import { Toaster } from 'react-hot-toast';
 
 export const metadata = {
   title: 'Book an Appointment | El Reno Nail Spa',
@@ -8,6 +9,7 @@ export const metadata = {
 export default function AppointmentsPage() {
   return (
     <main className="min-h-screen py-8 px-4">
+      <Toaster position="bottom-center" />
       <AppointmentForm />
     </main>
   );
