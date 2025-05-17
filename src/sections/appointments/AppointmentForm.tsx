@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import emailjs from 'emailjs-com';
 import { supabase } from '@/lib/supabaseClient';
 import AppointmentFormLayout from '@/components/AppointmentFormLayout';
+import { toast } from 'react-hot-toast';
 
 export default function AppointmentForm() {
   const [form, setForm] = useState({
@@ -21,6 +22,11 @@ export default function AppointmentForm() {
   const [submitting, setSubmitting] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<Record<string, number>>({});
 
+  const normalizeTime = (raw: string): string => {
+    const [h = '00', m = '00', s = '00'] = raw.split(':');
+    return `${h.padStart(2, '0')}:${m.padStart(2, '0')}:${s.padStart(2, '0')}`;
+  };
+
   useEffect(() => {
     const fetchBookings = async () => {
       if (!form.date) return;
@@ -31,7 +37,8 @@ export default function AppointmentForm() {
 
       const slotCount: Record<string, number> = {};
       data?.forEach(({ time }) => {
-        slotCount[time] = (slotCount[time] || 0) + 1;
+        const formatted = normalizeTime(time);
+        slotCount[formatted] = (slotCount[formatted] || 0) + 1;
       });
 
       setBookedSlots(slotCount);
@@ -78,7 +85,8 @@ export default function AppointmentForm() {
       for (const min of [0, 30]) {
         const h = hour.toString().padStart(2, '0');
         const m = min.toString().padStart(2, '0');
-        const timeStr = `${h}:${m}`;
+        const timeStr = `${h}:${m}:00`; // now using HH:MM:SS
+
 
         if (isToday) {
           const now = new Date();
@@ -118,72 +126,93 @@ export default function AppointmentForm() {
       setPhoneError('');
     }
 
+    const selectedTime = normalizeTime(form.time);
+
     const { data: existing } = await supabase
       .from('appointments')
       .select('id')
       .eq('date', form.date)
-      .eq('time', form.time);
+      .eq('time', selectedTime);
 
     if (existing && existing.length >= 5) {
-      alert('Sorry, this time slot is fully booked. Please choose another.');
+      toast.error('Sorry, this time slot is fully booked. Please choose another.');
       setSubmitting(false);
       return;
     }
 
-    await supabase.from('appointments').insert([
-      {
-        first_name: capitalize(form.firstName),
-        last_name: capitalize(form.lastName),
-        email: form.email || null,
+    try {
+      const { error, data, status } = await supabase
+        .from('appointments')
+        .insert([
+          {
+            first_name: capitalize(form.firstName),
+            last_name: capitalize(form.lastName),
+            email: form.email || null,
+            phone: phoneDigits,
+            tech: capitalize(form.tech),
+            message: form.message,
+            date: form.date,
+            time: selectedTime,
+          },
+        ])
+        .select();
+      console.log('Insert result:', { error, data, status });
+
+
+      if (error || status >= 400) {
+        console.error('Insert failed:', error?.message ?? JSON.stringify(error) ?? 'Unknown insert failure');
+        toast.error('That time slot just filled up. Please choose another.');
+        setSubmitting(false);
+        return;
+      }
+
+
+      const templateParams = {
+        firstName: capitalize(form.firstName),
+        lastName: capitalize(form.lastName),
+        email: form.email || 'N/A',
         phone: phoneDigits,
         tech: capitalize(form.tech),
         message: form.message,
         date: form.date,
-        time: form.time,
-      },
-    ]);
+        time: formatTime(selectedTime),
+      };
 
-    const templateParams = {
-      firstName: capitalize(form.firstName),
-      lastName: capitalize(form.lastName),
-      email: form.email || 'N/A',
-      phone: phoneDigits,
-      tech: capitalize(form.tech),
-      message: form.message,
-      date: form.date,
-      time: formatTime(form.time),
-    };
+      const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
 
-    const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
+      if (isValidEmail) {
+        await emailjs.send(
+          'service_oc3tvfe',
+          'template_ywly2ji',
+          templateParams,
+          'xTe_0sirIJPRptXcd'
+        );
+      } else {
+        await emailjs.send(
+          'service_oc3tvfe',
+          'template_uhpnfar',
+          templateParams,
+          'xTe_0sirIJPRptXcd'
+        );
+      }
 
-    if (isValidEmail) {
-      await emailjs.send(
-        'service_oc3tvfe',
-        'template_ywly2ji',
-        templateParams,
-        'xTe_0sirIJPRptXcd'
-      );
-    } else {
-      await emailjs.send(
-        'service_oc3tvfe',
-        'template_uhpnfar',
-        templateParams,
-        'xTe_0sirIJPRptXcd'
-      );
+      toast.success('Appointment request sent!');
+      setForm({
+        firstName: '',
+        lastName: '',
+        email: '',
+        phone: '',
+        tech: '',
+        message: '',
+        date: '',
+        time: '',
+      });
+    } catch (err: any) {
+      console.error('Trigger failure:', err);
+      toast.error('That time slot just filled up. Please choose another.');
+    } finally {
+      setSubmitting(false);
     }
-
-    alert('Appointment request sent!');
-    setForm({
-      firstName: '',
-      lastName: '',
-      email: '',
-      phone: '',
-      tech: '',
-      message: '',
-      date: '',
-      time: '',
-    });
-    setSubmitting(false);
   };
 
   return (
