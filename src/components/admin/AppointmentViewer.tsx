@@ -135,9 +135,11 @@ export default function AppointmentsViewer() {
             <div className="flex justify-center gap-4">
               <button
                 onClick={() => handleDelete(confirmId)}
-                className="bg-red-600 text-white px-4 py-2 rounded hover:bg-red-700"
+                disabled={deleting}
+                className={`px-4 py-2 rounded text-white ${deleting ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'
+                  }`}
               >
-                Yes, Delete
+                {deleting ? 'Deleting...' : 'Yes, Delete'}
               </button>
               <button
                 onClick={() => setConfirmId(null)}
