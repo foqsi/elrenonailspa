@@ -6,14 +6,17 @@ import ServicesEditor from '@/components/admin/ServicesEditor';
 import PromoBannerEditor from '@/components/admin/PromoBannerEditor';
 import GalleryManager from '@/components/admin/GalleryManager';
 import Throbber from '@/components/Throbber';
+import AppointmentsViewer from '@/components/admin/AppointmentViewer';
 
-type AdminTab = 'gallery' | 'services' | 'promo';
+type AdminTab = 'gallery' | 'services' | 'promo' | 'appointments';
 
 const tabs: { key: AdminTab; label: string }[] = [
   { key: 'gallery', label: 'Gallery' },
   { key: 'services', label: 'Services' },
   { key: 'promo', label: 'Promo Banner' },
+  { key: 'appointments', label: 'Appointments' },
 ];
+
 
 export default function AdminDashboard() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -102,6 +105,13 @@ export default function AdminDashboard() {
           <section>
             <h2 className="text-xl font-semibold mb-4 text-red-600">Edit Promo Banner</h2>
             <PromoBannerEditor />
+          </section>
+        )}
+
+        {activeTab === 'appointments' && (
+          <section>
+            <h2 className="text-xl font-semibold mb-4 text-red-600">View Appointments</h2>
+            <AppointmentsViewer />
           </section>
         )}
       </div>
