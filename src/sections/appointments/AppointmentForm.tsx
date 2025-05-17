@@ -207,23 +207,26 @@ export default function AppointmentForm() {
         date: '',
         time: '',
       });
-    } catch (err: any) {
-      console.error('Trigger failure:', err);
-      toast.error('That time slot just filled up. Please choose another.');
-    } finally {
-      setSubmitting(false);
-    }
-  };
+    } catch (err: unknown) {
+      if (err instanceof Error) {
+        console.error('Trigger failure:', err.message);
+        toast.error('That time slot just filled up. Please choose another.');
+      } else {
+        console.error('Unknown error:', err);
+        toast.error('An unexpected error occurred.');
+      }
+    };
 
-  return (
-    <AppointmentFormLayout
-      form={form}
-      phoneError={phoneError}
-      submitting={submitting}
-      handleChange={handleChange}
-      handleSubmit={handleSubmit}
-      getAvailableTimes={getAvailableTimes}
-      formatTime={formatTime}
-    />
-  );
+    return (
+      <AppointmentFormLayout
+        form={form}
+        phoneError={phoneError}
+        submitting={submitting}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        getAvailableTimes={getAvailableTimes}
+        formatTime={formatTime}
+      />
+    );
+  };
 }
