@@ -1,20 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabaseClient';
+import { fetchGallery } from './api';
+import { GalleryItem } from './types';
 import FadeIn from '@/components/animations/FadeIn';
 import FadeInLeft from '@/components/animations/FadeInLeft';
 import FadeInRight from '@/components/animations/FadeInRight';
 import FadeInDown from '@/components/animations/FadeInDown';
 import Throbber from '@/components/Throbber';
-
-interface GalleryItem {
-  id: number;
-  image_url: string;
-  caption: string | null;
-  uploaded_at: string;
-  featured: boolean;
-}
 
 export default function GallerySection() {
   const [images, setImages] = useState<GalleryItem[]>([]);
@@ -22,20 +15,10 @@ export default function GallerySection() {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    const fetchGallery = async () => {
-      const { data, error } = await supabase
-        .from('gallery')
-        .select('*')
-        .order('uploaded_at', { ascending: false });
-
-      if (!error && data) {
-        setImages(data);
-      }
-
+    fetchGallery().then((data) => {
+      setImages(data);
       setLoading(false);
-    };
-
-    fetchGallery();
+    });
   }, []);
 
   const openModal = (index: number) => setActiveIndex(index);
@@ -48,24 +31,24 @@ export default function GallerySection() {
 
   if (loading) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
+      <div className="min-h-screen flex items-center justify-center">
         <Throbber size={48} />
       </div>
     );
   }
 
   return (
-    <section className="py-16 bg-white">
+    <section className="pt-20 bg-white">
       <div className="container mx-auto px-4">
         <FadeInDown>
           <h1 className="text-4xl font-bold text-center text-red-600 mb-16">
             Gallery
           </h1>
         </FadeInDown>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {images.map((item, index) => {
             let Wrapper;
-
             if (index % 3 === 0) Wrapper = FadeInLeft;
             else if (index % 3 === 2) Wrapper = FadeInRight;
             else Wrapper = FadeIn;
@@ -93,14 +76,17 @@ export default function GallerySection() {
             );
           })}
         </div>
+
         <p className="text-center text-sm text-gray-500 mt-10 max-w-2xl mx-auto">
           <em>
-            All photos shown are real work completed by <strong>El Reno Nail Spa</strong>. These images are protected by copyright and must not be used, copied, or displayed anywhere else without permission.
+            All photos shown are real work completed by{' '}
+            <strong>El Reno Nail Spa</strong>. These images are protected by
+            copyright and must not be used, copied, or displayed anywhere else
+            without permission.
           </em>
         </p>
       </div>
 
-      {/* Modal */}
       {activeIndex !== null && (
         <div
           className="fixed inset-0 bg-black bg-opacity-80 z-[9999] flex items-center justify-center px-4"

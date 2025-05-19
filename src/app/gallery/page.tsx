@@ -1,4 +1,4 @@
-import GallerySection from '@/sections/gallery/Gallery';
+import GallerySection from '@/features/gallery/Gallery';
 
 export const metadata = {
   title: 'Gallery | El Reno Nail Spa',
@@ -34,7 +34,7 @@ export const metadata = {
 
 export default function GalleryPage() {
   return (
-    <main className="min-h-screen pt-8 px-4">
+    <main className="min-h-screen px-4">
       <GallerySection />
     </main>
   );

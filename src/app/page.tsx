@@ -1,4 +1,4 @@
-import Landing from '@/sections/landing/Landing';
+import Landing from '@/features/landing/Landing';
 
 export default function HomePage() {
   return (

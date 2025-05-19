@@ -47,7 +47,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <PromoBanner />
         </div>
 
-        {/* ✅ Add the toaster here */}
         <Toaster position="bottom-center" />
 
         {children}

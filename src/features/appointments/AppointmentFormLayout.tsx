@@ -33,7 +33,7 @@ export default function AppointmentFormLayout({
     formatTime,
 }: AppointmentFormLayoutProps) {
     return (
-        <main className="min-h-screen pt-24 px-4 bg-gray-50">
+        <main className="min-h-screen pt-20 px-4 bg-gray-50">
             <FadeInDown>
                 <h1 className="text-4xl font-bold text-center text-red-600 mb-16">Book an Appointment</h1>
             </FadeInDown>

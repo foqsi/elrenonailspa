@@ -30,13 +30,13 @@ export default function ServiceCard({
 
   return (
     <Wrapper delay={delay}>
-      <div className="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-xl transition-shadow duration-300 flex flex-col h-full">
+      <div className="bg-white shadow-lg rounded-xl overflow-hidden hover:shadow-xl hover:scale-105 duration-300 flex flex-col h-full">
         <Image
           src={image}
           alt={title}
           width={400}
           height={300}
-          className="w-full h-60 object-cover"
+          className="w-full h-60 object-cover hover:scale-110 transition-transform duration-300"
           unoptimized
         />
         <div className="p-6">
