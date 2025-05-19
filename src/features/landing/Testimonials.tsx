@@ -15,7 +15,7 @@ export default function Testimonials() {
         <div className="space-y-6 text-center">
           <blockquote className="italic text-gray-700">Lauryn says, “Friendly, clean, and professional.”</blockquote>
           <blockquote className="italic text-gray-700">“Wonderful service!” - Mckenzie</blockquote>
-          <blockquote className="italic text-gray-700">“Very friendly staff. Had a very good experience and great service. 😍 Will definitely come back!” - Jesetta</blockquote>
+          <blockquote className="italic text-gray-700">“Very friendly staff. Had a very good experience and great service.&quot; 😍 Will definitely come back!” - Jesetta</blockquote>
           <blockquote className="italic text-gray-700">Kaidence said, “Very clean , loved the environment. My nails are phenomenal. I Will definitely be back !&rdquo;</blockquote>
           <a
             href="https://www.google.com/maps/place/El+Reno+Nail+Spa/@35.5133954,-97.975736,17z/data=!4m18!1m9!3m8!1s0x87ade50cb473037d:0xcc81d0f60c379674!2sEl+Reno+Nail+Spa!8m2!3d35.5133954!4d-97.9731611!9m1!1b1!16s%2Fg%2F11lw3nms5d!3m7!1s0x87ade50cb473037d:0xcc81d0f60c379674!8m2!3d35.5133954!4d-97.9731611!9m1!1b1!16s%2Fg%2F11lw3nms5d?entry=ttu&g_ep=EgoyMDI1MDUwNS4wIKXMDSoASAFQAw%3D%3D"
