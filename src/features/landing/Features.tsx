@@ -44,7 +44,7 @@ export default function Services() {
           <Link href="/services">
             <ServiceCard
               title=""
-              description="Fun and gentle manicures and pedicures tailored for younger guests."
+              description="Fun and gentle manicures and pedicures tailored for younger our guests."
               image={kids}
               direction="left"
               delay={0.6}
@@ -53,7 +53,7 @@ export default function Services() {
           <Link href="/services">
             <ServiceCard
               title=""
-              description="Facial & limb waxing services for smooth, clean skin with a gentle touch."
+              description="Facial and limb waxing services for smooth, clean skin with a gentle touch."
               image={waxing}
               direction="up"
               delay={0.10}
