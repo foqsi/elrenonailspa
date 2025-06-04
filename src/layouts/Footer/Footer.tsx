@@ -17,12 +17,7 @@ export default function Footer() {
               <i className="fas fa-phone-alt mr-2 text-green-400" />
               <a href="tel:14056665565" className="hover:underline">(405) 666-5565</a>
             </p>
-            <p>
-              <i className="fas fa-envelope mr-2 text-blue-400" />
-              <a href="mailto:elrenonailspa@gmail.com" className="hover:underline">
-                elrenonailspa@gmail.com
-              </a>
-            </p>
+
           </div>
           <div className="mt-6 text-sm text-gray-300">
             <h4 className="font-semibold mb-2">Business Hours</h4>
