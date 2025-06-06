@@ -1,4 +1,5 @@
 import supabaseAdmin from '@/lib/supabaseAdmin';
+import { SALON_ID } from '@/lib/constants';
 
 export async function POST(req: Request) {
   const { id } = await req.json();
@@ -6,7 +7,8 @@ export async function POST(req: Request) {
   const { error } = await supabaseAdmin
     .from('gallery')
     .delete()
-    .eq('id', id);
+    .eq('id', id)
+    .eq('salon_id', SALON_ID);
 
   if (error) {
     console.error('Delete gallery error:', error.message);

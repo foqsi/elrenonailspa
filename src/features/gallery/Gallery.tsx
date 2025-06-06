@@ -9,13 +9,13 @@ import FadeInRight from '@/components/animations/FadeInRight';
 import FadeInDown from '@/components/animations/FadeInDown';
 import Throbber from '@/components/Throbber';
 
-export default function GallerySection() {
+export default function GallerySection({ salonId }: { salonId: string }) {
   const [images, setImages] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   useEffect(() => {
-    fetchGallery().then((data) => {
+    fetchGallery(salonId).then((data) => {
       setImages(data);
       setLoading(false);
     });
