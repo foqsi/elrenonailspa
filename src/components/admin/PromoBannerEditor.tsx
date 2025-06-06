@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import toast from 'react-hot-toast';
+import { SALON_ID } from '@/lib/constants';
 
 interface PromoBanner {
   id: string;
@@ -21,7 +22,11 @@ export default function PromoBannerEditor() {
 
   async function fetchBanners() {
     setLoading(true);
-    const { data } = await supabase.from('promo_banner').select('*').order('updated_at', { ascending: false });
+    const { data } = await supabase
+      .from('promo_banner')
+      .select('*')
+      .eq('salon_id', SALON_ID)
+      .order('updated_at', { ascending: false });
     if (data) setBanners(data);
     setLoading(false);
   }

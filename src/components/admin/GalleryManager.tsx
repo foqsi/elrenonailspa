@@ -3,6 +3,7 @@
 import toast from 'react-hot-toast';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { SALON_ID } from '@/lib/constants';
 
 interface GalleryItem {
   id: number;
@@ -24,6 +25,7 @@ export default function GalleryManager() {
     const { data, error } = await supabase
       .from('gallery')
       .select('*')
+      .eq('salon_id', SALON_ID)
       .order('uploaded_at', { ascending: false });
 
     if (!error && data) setImages(data);

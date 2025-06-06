@@ -24,25 +24,30 @@ export default function AppointmentsViewer() {
 
   const fetchAppointments = async () => {
     setLoading(true);
+
     const { data, error } = await supabase
       .from('appointments')
-      .select('id, first_name, last_name, date, time, phone, tech, message')
-      .eq('salon_id', SALON_ID)
+      .select('id, first_name, last_name, date, time, phone, tech, message, salon_id')
       .order('date', { ascending: true })
       .order('time', { ascending: true });
 
     if (error) {
-      toast.error('Error fetching appointments.');
-      console.error(error);
-    } else {
-      const today = new Date().toISOString().split('T')[0];
-      const upcoming = (data ?? []).filter((appt) => appt.date >= today);
-      setAppointments(upcoming);
+      console.error('Supabase error:', error);
+      toast.error('Failed to fetch appointments.');
+      setAppointments([]);
+      setLoading(false);
+      return;
     }
-    console.log('Fetched appointments:', data);
 
+    const today = new Date().toISOString().split('T')[0];
+    const upcoming = (data ?? [])
+      .filter((appt) => appt.salon_id === SALON_ID && appt.date >= today);
+
+    setAppointments(upcoming);
     setLoading(false);
   };
+
+
 
   useEffect(() => {
     fetchAppointments();

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
+import { SALON_ID } from '@/lib/constants';
 
 interface PromoData {
   id: string;
@@ -18,6 +19,7 @@ export default function PromoBanner() {
         .from('promo_banner')
         .select('*')
         .eq('enabled', true)
+        .eq('salon_id', SALON_ID)
         .order('updated_at', { ascending: false });
 
       if (data) setPromos(data);
