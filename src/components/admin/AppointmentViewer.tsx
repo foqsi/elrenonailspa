@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { toast } from 'react-hot-toast';
+import { SALON_ID } from '@/lib/constants';
 
 interface Appointment {
   id: string;
@@ -26,6 +27,7 @@ export default function AppointmentsViewer() {
     const { data, error } = await supabase
       .from('appointments')
       .select('id, first_name, last_name, date, time, phone, tech, message')
+      .eq('salon_id', SALON_ID)
       .order('date', { ascending: true })
       .order('time', { ascending: true });
 
