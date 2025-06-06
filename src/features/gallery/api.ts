@@ -2,7 +2,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { GalleryItem } from './types';
 import { SALON_ID } from '@/lib/constants';
 
-export async function fetchGallery(salonId: string): Promise<GalleryItem[]> {
+export async function fetchGallery(): Promise<GalleryItem[]> {
   return fetchGalleryById(SALON_ID);
 }
 
