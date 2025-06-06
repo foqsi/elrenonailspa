@@ -28,17 +28,26 @@ async function getServices(): Promise<{ categories: Category[]; services: Servic
     .eq('salon_id', SALON_ID)
     .order('sort_order');
 
+  if (catError) {
+    console.error('Failed to fetch categories:', catError.message);
+  }
+
   const { data: servicesRaw, error: servError } = await supabase
     .from('services')
     .select('id, name, description, price, price_modifier, category_id')
     .eq('salon_id', SALON_ID)
     .order('category_id');
 
-  const categories: Category[] = categoriesRaw ?? [];
-  const services: Service[] = servicesRaw ?? [];
+  if (servError) {
+    console.error('Failed to fetch services:', servError.message);
+  }
 
-  return { categories, services };
+  return {
+    categories: categoriesRaw ?? [],
+    services: servicesRaw ?? [],
+  };
 }
+
 
 export default async function ServicesPage() {
   const { categories, services } = await getServices();
