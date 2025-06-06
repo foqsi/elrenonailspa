@@ -1,21 +1,22 @@
 import supabaseAdmin from '@/lib/supabaseAdmin';
+import { SALON_ID } from '@/lib/constants';
 
 export async function POST(req: Request) {
-  const body = await req.json();
-
-  console.log('📥 Backend received:', body);
-
-  delete body.id;
-  const safeBody = body;
-
-  console.log('🧼 Inserting (safeBody):', safeBody);
+  const { name, price, description, category_id, price_modifier } = await req.json();
 
   const { error } = await supabaseAdmin
     .from('services')
-    .insert([safeBody]);
+    .insert([{
+      name,
+      price,
+      description,
+      category_id,
+      price_modifier: price_modifier ?? false,
+      salon_id: SALON_ID,
+    }]);
 
   if (error) {
-    console.error('🔥 Add service error:', error.message);
+    console.error('Add service error:', error.message);
     return new Response(error.message, { status: 500 });
   }
 

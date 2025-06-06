@@ -4,6 +4,7 @@ import { supabase } from '@/lib/supabaseClient';
 import FadeInDown from '@/components/animations/FadeInDown';
 import FadeInUp from '@/components/animations/FadeInUp';
 import FadeInRight from '@/components/animations/FadeInRight';
+import { SALON_ID } from '@/lib/constants';
 
 interface Service {
   id: number;
@@ -21,14 +22,16 @@ interface Category {
 }
 
 async function getServices(): Promise<{ categories: Category[]; services: Service[] }> {
-  const { data: categoriesRaw } = await supabase
+  const { data: categoriesRaw, error: catError } = await supabase
     .from('categories')
     .select('*')
+    .eq('salon_id', SALON_ID)
     .order('sort_order');
 
-  const { data: servicesRaw } = await supabase
+  const { data: servicesRaw, error: servError } = await supabase
     .from('services')
     .select('id, name, description, price, price_modifier, category_id')
+    .eq('salon_id', SALON_ID)
     .order('category_id');
 
   const categories: Category[] = categoriesRaw ?? [];

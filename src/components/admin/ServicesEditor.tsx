@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import toast from 'react-hot-toast';
+import { SALON_ID } from '@/lib/constants';
 
 interface Category {
   id: number;
@@ -30,8 +31,17 @@ export default function ServicesEditor() {
 
   async function fetchServicesAndCategories() {
     setLoading(true);
-    const { data: catData } = await supabase.from('categories').select('*').order('name');
-    const { data: svcData } = await supabase.from('services').select('*').order('category_id');
+    const { data: catData } = await supabase
+      .from('categories')
+      .select('*')
+      .eq('salon_id', SALON_ID)
+      .order('name');
+
+    const { data: svcData } = await supabase
+      .from('services')
+      .select('*')
+      .eq('salon_id', SALON_ID)
+      .order('category_id');
     if (catData) setCategories(catData);
     if (svcData) setServices(svcData);
     setLoading(false);
@@ -49,6 +59,7 @@ export default function ServicesEditor() {
       price: newService.price,
       category_id: newService.category_id,
       price_modifier: newService.price_modifier ?? false,
+      salon_id: SALON_ID,
     };
 
     console.log('Adding service:', safeService);
