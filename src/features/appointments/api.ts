@@ -1,6 +1,7 @@
 import { supabase } from '@/lib/supabaseClient';
 import emailjs from 'emailjs-com';
 import { AppointmentFormData } from './types';
+import { SALON_ID } from '@/lib/constants';
 
 export const normalizeTime = (raw: string): string => {
   const [h = '00', m = '00', s = '00'] = raw.split(':');
@@ -57,6 +58,7 @@ export async function submitAppointment(form: AppointmentFormData) {
         message: form.message,
         date: form.date,
         time: selectedTime,
+        salon_id: SALON_ID
       },
     ])
     .select();

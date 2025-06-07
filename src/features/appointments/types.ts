@@ -7,6 +7,7 @@ export interface AppointmentFormData {
   message: string;
   date: string;
   time: string;
+  salon_id: string;
 }
 
 export interface AppointmentFormLayoutProps {

@@ -11,6 +11,7 @@ import {
 import { AppointmentFormData } from './types';
 import AppointmentFormLayout from './AppointmentFormLayout';
 import { toast } from 'react-hot-toast';
+import { SALON_ID } from '@/lib/constants';
 
 export default function AppointmentForm() {
   const [form, setForm] = useState<AppointmentFormData>({
@@ -22,6 +23,7 @@ export default function AppointmentForm() {
     message: '',
     date: '',
     time: '',
+    salon_id: SALON_ID,
   });
 
   const [phoneError, setPhoneError] = useState('');
@@ -123,6 +125,7 @@ export default function AppointmentForm() {
         message: '',
         date: '',
         time: '',
+        salon_id: SALON_ID,
       });
     } catch (err) {
       if (err instanceof Error && err.message === 'Slot full') {

@@ -57,7 +57,7 @@ export default function AppointmentsViewer() {
 
   const handleDelete = async (id: string) => {
     setDeleting(true);
-    const res = await fetch('/api/admin/appointments/delete', {
+    const res = await fetch('/api/appointments/delete', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id }),
