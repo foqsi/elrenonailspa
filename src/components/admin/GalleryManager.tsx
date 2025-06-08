@@ -12,13 +12,17 @@ interface GalleryItem {
   uploaded_at: string;
 }
 
-export default function GalleryManager() {
+interface GalleryManagerProps {
+  refreshKey?: boolean;
+}
+
+export default function GalleryManager({ refreshKey }: GalleryManagerProps) {
   const [images, setImages] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchImages();
-  }, []);
+  }, [refreshKey]);
 
   const fetchImages = async () => {
     setLoading(true);
@@ -74,7 +78,7 @@ export default function GalleryManager() {
       ) : images.length === 0 ? (
         <p>No images uploaded yet.</p>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+        <div className="max-h-[600px] overflow-y-auto pr-2 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {images.map((img) => (
             <div key={img.id} className="bg-white shadow rounded p-2 text-center">
               <img

@@ -1,89 +1,82 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useRef } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import { applyLogoToImage } from '@/utils/applyLogoToImage';
 import toast from 'react-hot-toast';
 
-const logoPath = '/logo.png';
+const logoPath = '/templogo.png';
 
-export default function GalleryUploader() {
-  const [file, setFile] = useState<File | null>(null);
+export default function GalleryUploader({ onUploadComplete }: { onUploadComplete?: () => void }) {
+
+  const [files, setFiles] = useState<File[]>([]);
   const [caption, setCaption] = useState('');
   const [uploading, setUploading] = useState(false);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const uploaderRef = useRef<HTMLDivElement>(null);
 
-  useEffect(() => {
-    if (!file) {
-      setPreviewUrl(null);
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = (e) => setPreviewUrl(e.target?.result as string);
-    reader.readAsDataURL(file);
-  }, [file]);
 
   const handleUpload = async () => {
-    if (!file) {
-      toast.error('Please select a file.');
-      return;
-    }
-
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('Image must be under 5MB.');
+    if (files.length === 0) {
+      toast.error('Please select at least one image.');
       return;
     }
 
     setUploading(true);
 
     try {
-      const processedBlob = await applyLogoToImage(file, logoPath, 0.25);
-      const cleanName = file.name.replace(/\s+/g, '-').toLowerCase();
-      const filePath = `gallery/${Date.now()}-${cleanName}`;
+      for (const file of files) {
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error(`${file.name} is too large (max 5MB)`);
+          continue;
+        }
 
-      const { error: uploadError } = await supabase.storage
-        .from('gallery')
-        .upload(filePath, processedBlob);
+        const processedBlob = await applyLogoToImage(file, logoPath, 0.25);
+        const cleanName = file.name.replace(/\s+/g, '-').toLowerCase();
+        const filePath = `gallery/${Date.now()}-${cleanName}`;
 
-      if (uploadError) {
-        console.error('Upload error:', uploadError);
-        toast.error('Upload failed: ' + uploadError.message);
-        return;
+        const { error: uploadError } = await supabase.storage
+          .from('gallery')
+          .upload(filePath, processedBlob);
+
+        if (uploadError) {
+          console.error('Upload error:', uploadError);
+          toast.error(`Failed to upload ${file.name}: ${uploadError.message}`);
+          continue;
+        }
+
+        const { data: urlData } = supabase.storage
+          .from('gallery')
+          .getPublicUrl(filePath);
+
+        const res = await fetch('/api/admin/gallery/add', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            image_url: urlData.publicUrl,
+            caption,
+          }),
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          toast.error(`Failed to save ${file.name}: ${errText}`);
+        } else {
+          toast.success(`${file.name} uploaded successfully!`);
+        }
       }
 
-      const { data: urlData } = supabase.storage
-        .from('gallery')
-        .getPublicUrl(filePath);
-
-      const res = await fetch('/api/admin/gallery/add', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          image_url: urlData.publicUrl,
-          caption,
-        }),
-      });
-
-      if (!res.ok) {
-        const errText = await res.text();
-        console.error('Insert error:', errText);
-        toast.error('Failed to save to database: ' + errText);
-      } else {
-        toast.success('Image uploaded successfully!');
-        setFile(null);
-        setCaption('');
-        setPreviewUrl(null);
-        uploaderRef.current?.scrollIntoView({ behavior: 'smooth' });
-      }
+      setFiles([]);
+      setCaption('');
+      uploaderRef.current?.scrollIntoView({ behavior: 'smooth' });
+      onUploadComplete?.();
     } catch (err) {
       console.error('Processing error:', err);
-      toast.error('Failed to process image.');
+      toast.error('Something went wrong while uploading.');
     }
 
     setUploading(false);
   };
+
 
   return (
     <div
@@ -95,17 +88,26 @@ export default function GalleryUploader() {
       <input
         type="file"
         accept="image/*"
-        onChange={(e) => setFile(e.target.files?.[0] || null)}
+        multiple
+        onChange={(e) => setFiles(Array.from(e.target.files || []))}
         className="mb-4"
       />
 
-      {previewUrl && (
-        <img
-          src={previewUrl}
-          alt="Preview"
-          className="w-full h-48 object-contain rounded border mb-4"
-        />
+
+      {files.length > 0 && (
+        <div className="grid grid-cols-2 gap-2 mb-4">
+          {files.map((f, i) => (
+            <div key={i} className="border rounded overflow-hidden">
+              <img
+                src={URL.createObjectURL(f)}
+                alt="Preview"
+                className="w-full h-24 object-contain"
+              />
+            </div>
+          ))}
+        </div>
       )}
+
 
       <input
         type="text"

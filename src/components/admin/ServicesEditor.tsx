@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabaseClient';
 import toast from 'react-hot-toast';
 import { SALON_ID } from '@/lib/constants';
+import Throbber from '../Throbber';
 
 interface Category {
   id: number;
@@ -17,6 +18,7 @@ interface Service {
   price: number;
   category_id: number;
   price_modifier?: boolean;
+  sort_order?: number;
 }
 
 export default function ServicesEditor() {
@@ -35,7 +37,7 @@ export default function ServicesEditor() {
       .from('categories')
       .select('*')
       .eq('salon_id', SALON_ID)
-      .order('name');
+      .order('sort_order');
 
     const { data: svcData } = await supabase
       .from('services')
@@ -200,9 +202,13 @@ export default function ServicesEditor() {
       </div>
 
       {/* Service List */}
-      <div className="space-y-8">
+      {/* Scrollable Service List */}
+      <div className="max-h-[600px] overflow-y-auto pr-2 space-y-8 border rounded bg-white p-4">
+
         {loading ? (
-          <p>Loading services...</p>
+          <div className='flex justify-center items-center'>
+            <Throbber />
+          </div>
         ) : (
           servicesByCategory.map((cat) => (
             <div key={cat.id}>
