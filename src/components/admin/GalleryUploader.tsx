@@ -5,7 +5,7 @@ import { supabase } from '@/lib/supabaseClient';
 import { applyLogoToImage } from '@/utils/applyLogoToImage';
 import toast from 'react-hot-toast';
 
-const logoPath = '/templogo.png';
+const logoPath = '/logo.png';
 
 export default function GalleryUploader({ onUploadComplete }: { onUploadComplete?: () => void }) {
 
