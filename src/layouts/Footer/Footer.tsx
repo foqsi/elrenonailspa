@@ -69,7 +69,20 @@ export default function Footer() {
       {/* Bottom line */}
       <div className="mt-12 text-center text-gray-500 text-sm border-t border-gray-700 pt-6">
         &copy; {new Date().getFullYear()} El Reno Nail Spa. All rights reserved.
+        <div className="mt-2 text-xs">
+          Website by{' '}
+          <a
+            href="https://simplersalon.com"
+            className="text-blue-400 hover:underline"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            Simpler Salon
+          </a>
+          , a one-time-fee web design service.
+        </div>
       </div>
+
     </footer>
   );
 }
