@@ -115,8 +115,6 @@ export default function AdminDashboard() {
         </section>
       )}
 
-
-
       {/* Tab Panels */}
       <div className="space-y-12 flex justify-center ">
         {activeTab === 'gallery' && (
@@ -127,21 +125,12 @@ export default function AdminDashboard() {
           </section>
         )}
 
-
-        {activeTab === 'services' && (
-          <section>
-            {servicesSubTab === 'services' && <ServicesEditor />}
-            {servicesSubTab === 'categories' && <CategoryEditor />}
-          </section>
-        )}
-
         {activeTab === 'promo' && (
           <section className="px-4">
             <h2 className="text-xl font-semibold mb-4 text-red-600 text-center">Edit Promo Banner</h2>
             <PromoBannerEditor />
           </section>
         )}
-
 
         {activeTab === 'appointments' && (
           <section className="px-4">
