@@ -118,7 +118,7 @@ export default function PromoBannerEditor() {
       <div className="bg-white p-4 sm:p-6 rounded shadow-md">
         <h3 className="text-lg font-bold mb-3">All Promo Banners</h3>
         <p className="text-sm text-gray-600 mb-4">
-          <span className="text-red-600 font-bold">***</span> Click "Save" on a banner to move it to the top and refresh the page.
+          <span className="text-red-600 font-bold">***</span> Click <strong>Save</strong> on a banner to move it to the top and refresh the page.
         </p>
 
         {loading ? (
