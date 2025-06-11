@@ -21,10 +21,14 @@ export default function AppointmentsViewer() {
   const [loading, setLoading] = useState(true);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [expandedRows, setExpandedRows] = useState<Set<string>>(new Set());
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    fetchAppointments();
+  }, []);
 
   const fetchAppointments = async () => {
     setLoading(true);
-
     const { data, error } = await supabase
       .from('appointments')
       .select('id, first_name, last_name, date, time, phone, tech, message, salon_id')
@@ -40,20 +44,13 @@ export default function AppointmentsViewer() {
     }
 
     const today = new Date().toISOString().split('T')[0];
-    const upcoming = (data ?? [])
-      .filter((appt) => appt.salon_id === SALON_ID && appt.date >= today);
+    const upcoming = (data ?? []).filter(
+      (appt) => appt.salon_id === SALON_ID && appt.date >= today
+    );
 
     setAppointments(upcoming);
     setLoading(false);
   };
-
-
-
-  useEffect(() => {
-    fetchAppointments();
-  }, []);
-
-  const [deleting, setDeleting] = useState(false);
 
   const handleDelete = async (id: string) => {
     setDeleting(true);
@@ -74,26 +71,22 @@ export default function AppointmentsViewer() {
     setConfirmId(null);
   };
 
+  const toggleRowExpansion = (id: string) => {
+    setExpandedRows((prev) => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
+  };
+
   const groupedByDate = appointments.reduce<Record<string, Appointment[]>>((acc, appt) => {
     if (!acc[appt.date]) acc[appt.date] = [];
     acc[appt.date].push(appt);
     return acc;
   }, {});
 
-  const toggleRowExpansion = (id: string) => {
-    setExpandedRows((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else {
-        next.add(id);
-      }
-      return next;
-    });
-  };
-
   return (
-    <div className="space-y-12 relative">
+    <div className="space-y-8">
       {loading ? (
         <p className="text-gray-500">Loading...</p>
       ) : appointments.length === 0 ? (
@@ -101,17 +94,20 @@ export default function AppointmentsViewer() {
       ) : (
         Object.entries(groupedByDate).map(([date, appts]) => (
           <div key={date}>
-            <h3 className="text-lg font-bold mb-2 text-gray-700">{date}</h3>
-            <div className="overflow-x-auto">
+            <h3 className="text-lg font-bold mb-4 text-gray-800">{date}</h3>
+
+            {/* Table for larger screens */}
+            <div className="hidden sm:block overflow-x-auto">
               <table className="w-full text-sm border border-gray-300 min-w-[600px]">
                 <thead className="bg-red-100 text-left">
                   <tr>
-                    <th className="p-2 border text-center">Actions</th>
-                    <th className="p-2 border">Time</th>
-                    <th className="p-2 border">Name</th>
-                    <th className="p-2 border">Phone</th>
-                    <th className="p-2 border">Tech</th>
-                    <th className="p-2 border">Message</th>
+                    <th className="w-[80px] p-2 border text-center">Actions</th>
+                    <th className="w-[100px] p-2 border">Time</th>
+                    <th className="w-[150px] p-2 border">Name</th>
+                    <th className="w-[140px] p-2 border">Phone</th>
+                    <th className="w-[100px] p-2 border">Tech</th>
+                    <th className="w-auto p-2 border">Message</th>
+
                   </tr>
                 </thead>
                 <tbody>
@@ -126,7 +122,9 @@ export default function AppointmentsViewer() {
                         </button>
                       </td>
                       <td className="p-2 border whitespace-nowrap">{appt.time}</td>
-                      <td className="p-2 border">{appt.first_name} {appt.last_name}</td>
+                      <td className="p-2 border">
+                        {appt.first_name} {appt.last_name}
+                      </td>
                       <td className="p-2 border">
                         <a
                           href={`tel:${appt.phone}`}
@@ -157,11 +155,61 @@ export default function AppointmentsViewer() {
                           <span className="italic text-gray-400">No message</span>
                         )}
                       </td>
-
                     </tr>
                   ))}
                 </tbody>
               </table>
+            </div>
+
+            {/* Card layout for mobile */}
+            <div className="sm:hidden space-y-4">
+              {appts.map((appt) => (
+                <div key={appt.id} className="border rounded p-4 bg-white shadow-sm">
+                  <div className="flex justify-between mb-2">
+                    <div className="text-lg text-red-600">{appt.time}</div>
+                    <button
+                      onClick={() => setConfirmId(appt.id)}
+                      className="text-red-600 text-xs font-semibold hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                  <div className="text-base font-semibold text-gray-800 mb-1">
+                    {appt.first_name} {appt.last_name}
+                  </div>
+                  <div className="text-sm text-gray-600 mb-1">
+                    <span className="font-medium">Phone:</span>{' '}
+                    <a href={`tel:${appt.phone}`} className="text-blue-600 underline">
+                      {appt.phone}
+                    </a>
+                  </div>
+                  <div className="text-sm text-gray-600 mb-1">
+                    <span className="font-medium">Tech:</span> {appt.tech}
+                  </div>
+                  <div className="text-sm text-gray-700 whitespace-pre-wrap">
+                    <span className="font-medium">Message:</span>{' '}
+                    {appt.message ? (
+                      <>
+                        {expandedRows.has(appt.id)
+                          ? appt.message
+                          : appt.message.length > 80
+                            ? `${appt.message.slice(0, 80)}...`
+                            : appt.message}
+                        {appt.message.length > 80 && (
+                          <button
+                            onClick={() => toggleRowExpansion(appt.id)}
+                            className="ml-1 text-blue-600 underline text-xs"
+                          >
+                            {expandedRows.has(appt.id) ? 'Show less' : 'Show more'}
+                          </button>
+                        )}
+                      </>
+                    ) : (
+                      <span className="italic text-gray-400">No message</span>
+                    )}
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
         ))
@@ -177,7 +225,9 @@ export default function AppointmentsViewer() {
               <button
                 onClick={() => handleDelete(confirmId)}
                 disabled={deleting}
-                className={`px-4 py-2 rounded text-white ${deleting ? 'bg-gray-400 cursor-not-allowed' : 'bg-red-600 hover:bg-red-700'
+                className={`px-4 py-2 rounded text-white ${deleting
+                  ? 'bg-gray-400 cursor-not-allowed'
+                  : 'bg-red-600 hover:bg-red-700'
                   }`}
               >
                 {deleting ? 'Deleting...' : 'Yes, Delete'}

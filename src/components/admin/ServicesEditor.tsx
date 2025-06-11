@@ -129,13 +129,13 @@ export default function ServicesEditor() {
   }));
 
   return (
-    <div className="space-y-12">
+    <div className="space-y-8">
       {/* Add New Service */}
-      <div className="bg-white p-6 rounded shadow-md">
-        <h3 className="text-lg font-bold mb-4">Add New Service</h3>
-        <div className="flex flex-col gap-4 md:flex-row">
+      <div className="bg-white p-4 sm:p-6 rounded shadow-md">
+        <h3 className="text-lg font-bold mb-3">Add New Service</h3>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
           <select
-            className="border p-2 rounded w-full md:w-1/3"
+            className="border p-2 rounded w-full"
             value={newService.category_id ?? ''}
             onChange={(e) =>
               setNewService({ ...newService, category_id: Number(e.target.value) })
@@ -148,30 +148,29 @@ export default function ServicesEditor() {
               </option>
             ))}
           </select>
+
           <input
             type="text"
             placeholder="Service Name"
-            className="border p-2 rounded w-full md:w-1/3"
+            className="border p-2 rounded w-full"
             value={newService.name ?? ''}
             onChange={(e) =>
               setNewService({ ...newService, name: e.target.value })
             }
           />
+
           <input
             type="number"
             placeholder="Price"
-            className="border p-2 rounded w-full md:w-1/3"
+            className="border p-2 rounded w-full"
             value={newService.price ?? ''}
             onChange={(e) =>
               setNewService({ ...newService, price: parseFloat(e.target.value) })
             }
           />
-          <div className="flex items-start justify-end">
-            <label htmlFor="price-modifier" className="text-sm font-medium text-gray-700 mb-1">
-              Add `+` after price
-            </label>
+
+          <label className="flex items-center gap-2 text-sm text-gray-700">
             <input
-              id="price-modifier"
               type="checkbox"
               checked={!!newService.price_modifier}
               onChange={(e) =>
@@ -181,12 +180,13 @@ export default function ServicesEditor() {
                 })
               }
             />
-          </div>
+            Add `+` after price
+          </label>
         </div>
 
         <textarea
           placeholder="Description"
-          className="mt-4 border p-2 rounded w-full"
+          className="mt-3 border p-2 rounded w-full"
           value={newService.description ?? ''}
           onChange={(e) =>
             setNewService({ ...newService, description: e.target.value })
@@ -195,24 +195,22 @@ export default function ServicesEditor() {
 
         <button
           onClick={handleAddService}
-          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500"
+          className="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-500 w-full sm:w-auto"
         >
           Add Service
         </button>
       </div>
 
       {/* Service List */}
-      {/* Scrollable Service List */}
-      <div className="max-h-[600px] overflow-y-auto pr-2 space-y-8 border rounded bg-white p-4">
-
+      <div className="max-h-[600px] overflow-y-auto pr-1 space-y-6 border rounded bg-white p-4 sm:p-4">
         {loading ? (
-          <div className='flex justify-center items-center'>
+          <div className="flex justify-center items-center">
             <Throbber />
           </div>
         ) : (
           servicesByCategory.map((cat) => (
             <div key={cat.id}>
-              <h4 className="text-xl font-bold text-red-600 mb-2">{cat.name}</h4>
+              <h4 className="text-lg font-bold text-red-600 mb-2">{cat.name}</h4>
               {cat.services.length === 0 ? (
                 <p className="text-gray-500 text-sm">No services</p>
               ) : (
@@ -220,76 +218,72 @@ export default function ServicesEditor() {
                   {cat.services.map((service) => (
                     <div
                       key={service.id}
-                      className="bg-white p-4 border rounded-md shadow-sm flex flex-col md:flex-row md:items-center gap-4"
+                      className="bg-white p-2 sm:p-4 border rounded-md shadow-sm space-y-3 sm:space-y-0 sm:flex sm:flex-wrap sm:items-center gap-2"
                     >
                       <input
                         type="text"
-                        className="border p-2 rounded w-full md:w-1/3"
+                        className="border p-2 rounded w-full sm:w-[180px] text-gray-800"
                         value={service.name}
                         onChange={(e) =>
                           setServices((prev) =>
                             prev.map((s) =>
-                              s.id === service.id
-                                ? { ...s, name: e.target.value }
-                                : s
+                              s.id === service.id ? { ...s, name: e.target.value } : s
                             )
                           )
                         }
                       />
+
                       <input
                         type="text"
-                        className="border p-2 rounded w-full md:w-1/3"
+                        className="border p-2 rounded w-full sm:flex-1"
                         value={service.description ?? ''}
                         onChange={(e) =>
                           setServices((prev) =>
                             prev.map((s) =>
-                              s.id === service.id
-                                ? { ...s, description: e.target.value }
-                                : s
+                              s.id === service.id ? { ...s, description: e.target.value } : s
                             )
                           )
                         }
                       />
+
                       <input
                         type="number"
-                        className="border p-2 rounded w-full md:w-1/6"
+                        className="border p-2 rounded w-full sm:w-[100px]"
                         value={service.price}
                         onChange={(e) =>
                           setServices((prev) =>
                             prev.map((s) =>
-                              s.id === service.id
-                                ? { ...s, price: parseFloat(e.target.value) }
-                                : s
+                              s.id === service.id ? { ...s, price: parseFloat(e.target.value) } : s
                             )
                           )
                         }
                       />
-                      <div className="flex flex-col items-start md:w-1/6">
-                        <label className="text-sm text-gray-700">Add +</label>
+
+                      <label className="flex items-center gap-1 text-sm text-gray-700 sm:w-[80px]">
                         <input
                           type="checkbox"
                           checked={!!service.price_modifier}
                           onChange={(e) =>
                             setServices((prev) =>
                               prev.map((s) =>
-                                s.id === service.id
-                                  ? { ...s, price_modifier: e.target.checked }
-                                  : s
+                                s.id === service.id ? { ...s, price_modifier: e.target.checked } : s
                               )
                             )
                           }
                         />
-                      </div>
-                      <div className="flex gap-2">
+                        Add `+` after price
+                      </label>
+
+                      <div className="flex gap-2 sm:ml-auto">
                         <button
                           onClick={() => handleUpdateService(service)}
-                          className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-500"
+                          className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-500 text-sm"
                         >
                           Save
                         </button>
                         <button
                           onClick={() => handleDeleteService(service.id)}
-                          className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500"
+                          className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 text-sm"
                         >
                           Delete
                         </button>

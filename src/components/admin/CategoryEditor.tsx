@@ -4,7 +4,16 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { supabase } from '@/lib/supabaseClient';
 import { SALON_ID } from '@/lib/constants';
-import { DndContext, DragEndEvent, closestCenter } from '@dnd-kit/core';
+import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  TouchSensor,
+  MouseSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from '@dnd-kit/core';
 import {
   arrayMove,
   SortableContext,
@@ -12,7 +21,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical } from 'lucide-react'; // or your preferred icon
+import { GripVertical } from 'lucide-react';
 
 interface Category {
   id: number;
@@ -45,7 +54,7 @@ function SortableItem({
       className="flex items-center justify-between border-b py-2 gap-2"
     >
       <div className="flex items-center gap-2 w-full">
-        <div {...attributes} {...listeners} className="cursor-grab text-gray-400">
+        <div {...attributes} {...listeners} className="cursor-grab text-gray-400 touch-none">
           <GripVertical size={20} />
         </div>
         <input
@@ -79,6 +88,21 @@ export default function CategoryEditor() {
   useEffect(() => {
     fetchCategories();
   }, []);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        delay: 250,
+        tolerance: 5,
+      },
+    }),
+    useSensor(MouseSensor)
+  );
 
   async function fetchCategories() {
     const { data, error } = await supabase
@@ -200,7 +224,7 @@ export default function CategoryEditor() {
   return (
     <div className="bg-white p-6 rounded shadow-md">
       <h3 className="text-lg font-bold mb-4">Edit Service Categories</h3>
-      <div className="flex gap-4 mb-6">
+      <div className="flex flex-col sm:flex-row gap-4 mb-6">
         <input
           className="border p-2 rounded w-full"
           value={newCategory}
@@ -209,13 +233,21 @@ export default function CategoryEditor() {
         />
         <button
           onClick={handleAddCategory}
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500"
+          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-500 w-full sm:w-auto"
         >
           Add
         </button>
       </div>
 
-      <DndContext collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+      <p className="text-sm text-gray-600">
+        <span className="text-red-600 font-bold">***</span> Click or touch and hold the left icons to reorder categories.
+      </p>
+
+      <DndContext
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+        sensors={sensors}
+      >
         <SortableContext items={categories.map((c) => c.id)} strategy={verticalListSortingStrategy}>
           <div className="space-y-2">
             {categories.map((cat) => (

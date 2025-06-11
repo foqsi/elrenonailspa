@@ -81,9 +81,9 @@ export default function GalleryUploader({ onUploadComplete }: { onUploadComplete
   return (
     <div
       ref={uploaderRef}
-      className="max-w-md bg-white p-6 shadow rounded scroll-mt-24"
+      className="max-w-md bg-white p-2 shadow-md rounded-xl scroll-mt-24"
     >
-      <h2 className="text-lg font-bold mb-4">Upload Image</h2>
+      <h2 className="text-lg font-bold mb-4 text-red-800">Upload Images</h2>
 
       <input
         type="file"
@@ -93,21 +93,19 @@ export default function GalleryUploader({ onUploadComplete }: { onUploadComplete
         className="mb-4"
       />
 
-
       {files.length > 0 && (
-        <div className="grid grid-cols-2 gap-2 mb-4">
+        <div className="grid grid-cols-2 gap-1 mb-4">
           {files.map((f, i) => (
             <div key={i} className="border rounded overflow-hidden">
               <img
                 src={URL.createObjectURL(f)}
                 alt="Preview"
-                className="w-full h-24 object-contain"
+                className="w-full h-20 object-contain"
               />
             </div>
           ))}
         </div>
       )}
-
 
       <input
         type="text"

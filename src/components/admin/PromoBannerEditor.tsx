@@ -27,6 +27,7 @@ export default function PromoBannerEditor() {
       .select('*')
       .eq('salon_id', SALON_ID)
       .order('updated_at', { ascending: false });
+
     if (data) setBanners(data);
     setLoading(false);
   }
@@ -34,11 +35,7 @@ export default function PromoBannerEditor() {
   async function updateBanner(updated: PromoBanner) {
     const res = await fetch('/api/admin/promo/update', {
       method: 'POST',
-      body: JSON.stringify({
-        id: updated.id,
-        text: updated.text,
-        enabled: updated.enabled,
-      }),
+      body: JSON.stringify(updated),
       headers: { 'Content-Type': 'application/json' },
     });
 
@@ -97,9 +94,10 @@ export default function PromoBannerEditor() {
 
   return (
     <div className="space-y-6">
-      <div className="bg-white p-6 rounded shadow-md">
-        <h3 className="text-lg font-bold mb-4">Create New Promo Banner</h3>
-        <div className="flex flex-col sm:flex-row gap-4">
+      {/* Create Banner */}
+      <div className="bg-white p-4 sm:p-6 rounded shadow-md">
+        <h3 className="text-lg font-bold mb-3">Create New Promo Banner</h3>
+        <div className="flex flex-col sm:flex-row gap-3">
           <input
             type="text"
             placeholder="Promo message"
@@ -109,28 +107,31 @@ export default function PromoBannerEditor() {
           />
           <button
             onClick={createBanner}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500"
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-500 w-full sm:w-auto"
           >
             Add
           </button>
         </div>
       </div>
 
-      <div className="bg-white p-6 rounded shadow-md">
-        <h3 className="text-lg font-bold mb-4">All Promo Banners</h3>
-        <p className='text-md font-bold text-gray-500'>
-          <span className='text-lg font-bold text-red-600'>*** </span>
-          If you want to change the order, simply click save to move one to the top and refresh the page.
+      {/* Existing Banners */}
+      <div className="bg-white p-4 sm:p-6 rounded shadow-md">
+        <h3 className="text-lg font-bold mb-3">All Promo Banners</h3>
+        <p className="text-sm text-gray-600 mb-4">
+          <span className="text-red-600 font-bold">***</span> Click "Save" on a banner to move it to the top and refresh the page.
         </p>
 
         {loading ? (
-          <p>Loading...</p>
+          <p className="text-gray-500">Loading...</p>
         ) : banners.length === 0 ? (
           <p className="text-sm text-gray-500">No banners found.</p>
         ) : (
           <div className="space-y-4">
             {banners.map((banner) => (
-              <div key={banner.id} className="border p-4 rounded flex flex-col sm:flex-row sm:items-center gap-4">
+              <div
+                key={banner.id}
+                className="border p-3 sm:p-4 rounded flex flex-col sm:flex-row sm:items-center gap-3 sm:gap-4"
+              >
                 <input
                   type="text"
                   value={banner.text}
@@ -143,7 +144,7 @@ export default function PromoBannerEditor() {
                   }
                   className="flex-1 border p-2 rounded"
                 />
-                <label className="flex items-center gap-2">
+                <label className="flex items-center gap-2 text-sm text-gray-700">
                   <input
                     type="checkbox"
                     checked={banner.enabled}
@@ -157,16 +158,16 @@ export default function PromoBannerEditor() {
                   />
                   Show
                 </label>
-                <div className="flex gap-2">
+                <div className="flex gap-2 sm:ml-auto">
                   <button
                     onClick={() => updateBanner(banner)}
-                    className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500"
+                    className="bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-500 text-sm"
                   >
                     Save
                   </button>
                   <button
                     onClick={() => deleteBanner(banner.id)}
-                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500"
+                    className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 text-sm"
                   >
                     Delete
                   </button>

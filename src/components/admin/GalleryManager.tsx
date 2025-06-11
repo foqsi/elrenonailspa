@@ -71,8 +71,8 @@ export default function GalleryManager({ refreshKey }: GalleryManagerProps) {
   };
 
   return (
-    <div className="mt-8">
-      <h2 className="text-lg font-bold mb-4">Manage Uploaded Images</h2>
+    <div className="mt-8 px-4">
+      <h2 className="text-lg font-bold mb-4 text-red-600">Manage Uploaded Images</h2>
       {loading ? (
         <p>Loading images...</p>
       ) : images.length === 0 ? (

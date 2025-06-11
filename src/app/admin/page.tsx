@@ -61,9 +61,10 @@ export default function AdminDashboard() {
 
 
   return (
-    <main className="min-h-screen pt-20 px-4 max-w-5xl mx-auto">
-      <div className="flex justify-between items-center mb-2">
-        <h1 className="text-3xl font-bold text-red-600">Admin Dashboard</h1>
+    <main className="min-h-screen pt-8 max-w-6xl mx-auto bg-gray-100/50">
+      {/* Header */}
+      <div className="sticky top-0 z-10 to-transparent py-4 px-4 backdrop-blur-sm rounded-md flex justify-between items-center shadow-md mb-6">
+        <h1 className="text-2xl md:text-3xl font-bold text-red-500">Admin Dashboard</h1>
         <button
           onClick={handleLogout}
           className="bg-gray-200 text-gray-800 px-4 py-2 rounded hover:bg-gray-300 transition"
@@ -81,7 +82,7 @@ export default function AdminDashboard() {
               handleTabChange(tab.key);
               setServicesSubTab('services');
             }}
-            className={`px-4 py-2 font-medium border-b-2 transition-colors duration-200 ${activeTab === tab.key
+            className={`px-4 py-2 font-medium border-b-2 transition-colors duration-200 bg-gray-100 ${activeTab === tab.key
               ? 'border-red-600 text-red-600'
               : 'border-transparent text-gray-500 hover:text-red-500'
               }`}
@@ -93,53 +94,62 @@ export default function AdminDashboard() {
 
       {/* Sub Tabs for Services */}
       {activeTab === 'services' && (
-        <div className="flex justify-center mb-4 gap-1">
-          {(['services', 'categories'] as ServicesSubTab[]).map((key) => (
-            <button
-              key={key}
-              onClick={() => setServicesSubTab(key)}
-              className={`px-4 py-1 font-medium border-b-2 transition-colors duration-200 ${servicesSubTab === key
-                ? 'border-red-600 text-red-600'
-                : 'border-transparent text-gray-500 hover:text-red-500'
-                }`}
-            >
-              {key === 'services' ? 'Edit Services' : 'Edit Categories'}
-            </button>
-          ))}
-        </div>
+        <section className="px-4">
+          <h2 className="text-xl font-semibold mb-4 text-red-600 text-center">Manage Services</h2>
+          <div className="flex justify-center gap-2 mb-6">
+            {(['services', 'categories'] as ServicesSubTab[]).map((key) => (
+              <button
+                key={key}
+                onClick={() => setServicesSubTab(key)}
+                className={`px-3 py-1 rounded-md font-medium transition ${servicesSubTab === key
+                  ? 'bg-red-600 text-white shadow'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  }`}
+              >
+                {key === 'services' ? 'Edit Services' : 'Edit Categories'}
+              </button>
+            ))}
+          </div>
+          {servicesSubTab === 'services' && <ServicesEditor />}
+          {servicesSubTab === 'categories' && <CategoryEditor />}
+        </section>
       )}
+
+
 
       {/* Tab Panels */}
       <div className="space-y-12 flex justify-center ">
         {activeTab === 'gallery' && (
-          <section>
-            <h2 className="text-xl font-semibold mb-4 text-red-600">Upload Gallery Images</h2>
+          <section className="px-4">
+            <h2 className="text-xl font-semibold mb-4 text-red-600 text-center">Upload Gallery Images</h2>
             <GalleryUploader onUploadComplete={() => setGalleryUpdated((v) => !v)} />
             <GalleryManager refreshKey={galleryUpdated} />
           </section>
         )}
 
+
         {activeTab === 'services' && (
           <section>
-            <h2 className="text-xl font-semibold mb-4 text-red-600">Manage Services</h2>
             {servicesSubTab === 'services' && <ServicesEditor />}
             {servicesSubTab === 'categories' && <CategoryEditor />}
           </section>
         )}
 
         {activeTab === 'promo' && (
-          <section>
-            <h2 className="text-xl font-semibold mb-4 text-red-600">Edit Promo Banner</h2>
+          <section className="px-4">
+            <h2 className="text-xl font-semibold mb-4 text-red-600 text-center">Edit Promo Banner</h2>
             <PromoBannerEditor />
           </section>
         )}
 
+
         {activeTab === 'appointments' && (
-          <section>
-            <h2 className="text-xl font-semibold mb-4 text-red-600">View Appointments</h2>
+          <section className="px-4">
+            <h2 className="text-xl font-semibold mb-4 text-red-600 text-center">View Appointments</h2>
             <AppointmentsViewer />
           </section>
         )}
+
       </div>
     </main>
 
