@@ -13,6 +13,7 @@ interface AppointmentFormLayoutProps {
         date: string;
         time: string;
     };
+    emailError: string;
     phoneError: string;
     submitting: boolean;
     handleChange: (
@@ -25,6 +26,7 @@ interface AppointmentFormLayoutProps {
 
 export default function AppointmentFormLayout({
     form,
+    emailError,
     phoneError,
     submitting,
     handleChange,
@@ -41,7 +43,8 @@ export default function AppointmentFormLayout({
             <div className="max-w-xl mx-auto bg-white p-8 shadow-lg rounded-lg">
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <p className="text-sm text-gray-500 mb-2 text-center">
-                        Fields marked with <span className="text-red-500">*</span> are required.
+                        Fields marked with <span className="text-red-500">*</span> are required. <br />
+                        Email is only required for auto confirmation via email.
                     </p>
 
                     {/* Name Fields */}
@@ -84,6 +87,9 @@ export default function AppointmentFormLayout({
                             onChange={handleChange}
                             className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
                         />
+                        {emailError && (
+                            <p className='text-sm text-red-500 mt-1'>{emailError}</p>
+                        )}
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">

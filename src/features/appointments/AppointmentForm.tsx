@@ -26,6 +26,7 @@ export default function AppointmentForm() {
     salon_id: SALON_ID,
   });
 
+  const [emailError, setEmailError] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<Record<string, number>>({});
@@ -51,8 +52,22 @@ export default function AppointmentForm() {
 
       setForm((prev) => ({ ...prev, phone: formatted }));
       setPhoneError(digits.length === 10 ? '' : 'Please enter a valid 10-digit phone number.');
+    } else if (name === 'email') {
+      setForm((prev) => ({ ...prev, email: value }));
+
+      const validDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'icloud.com', 'hotmail.com'];
+      const emailParts = value.split('@');
+
+      if (
+        emailParts.length !== 2 ||
+        !validDomains.includes(emailParts[1].toLowerCase())
+      ) {
+        setEmailError('Please enter a valid email.');
+      } else {
+        setEmailError('');
+      }
     } else {
-      setForm((prev) => ({ ...prev, [name]: value }));
+      setForm((prev) => ({ ...prev, [name]: value }))
     }
   };
 
@@ -102,17 +117,8 @@ export default function AppointmentForm() {
       return;
     }
 
-    // Email validation
-    const validDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'icloud.com', 'hotmail.com'];
-    const emailParts = form.email.split('@');
-
-    if (
-      emailParts.length !== 2 ||
-      !validDomains.includes(emailParts[1].toLowerCase())
-    ) {
-      toast.error('Please enter a valid email address.');
+    if (emailError) {
       setSubmitting(false);
-      return;
     }
 
     const selectedTime = normalizeTime(form.time);
@@ -140,6 +146,8 @@ export default function AppointmentForm() {
         time: '',
         salon_id: SALON_ID,
       });
+      setEmailError('');
+      setPhoneError('');
     } catch (err) {
       if (err instanceof Error && err.message === 'Slot full') {
         toast.error('Sorry, this time slot is fully booked. Please choose another.');
@@ -155,6 +163,7 @@ export default function AppointmentForm() {
   return (
     <AppointmentFormLayout
       form={form}
+      emailError={emailError}
       phoneError={phoneError}
       submitting={submitting}
       handleChange={handleChange}
