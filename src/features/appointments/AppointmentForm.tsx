@@ -102,6 +102,19 @@ export default function AppointmentForm() {
       return;
     }
 
+    // Email validation
+    const validDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'icloud.com', 'hotmail.com'];
+    const emailParts = form.email.split('@');
+
+    if (
+      emailParts.length !== 2 ||
+      !validDomains.includes(emailParts[1].toLowerCase())
+    ) {
+      toast.error('Please enter a valid email address.');
+      setSubmitting(false);
+      return;
+    }
+
     const selectedTime = normalizeTime(form.time);
 
     const submission: AppointmentFormData = {
