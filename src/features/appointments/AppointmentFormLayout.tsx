@@ -34,6 +34,15 @@ export default function AppointmentFormLayout({
     getAvailableTimes,
     formatTime,
 }: AppointmentFormLayoutProps) {
+
+    const today = new Date();
+    const currentYear = today.getFullYear();
+    const nextYear = currentYear + 1;
+
+    const minDate = today.toISOString().split('T')[0];
+    const maxDate = `${nextYear}-12-31`;
+
+
     return (
         <main className="min-h-screen pt-20 px-4 bg-gray-50">
             <FadeInDown>
@@ -121,7 +130,8 @@ export default function AppointmentFormLayout({
                                 name="date"
                                 value={form.date}
                                 onChange={handleChange}
-                                min={new Date().toISOString().split('T')[0]}
+                                min={minDate}
+                                max={maxDate}
                                 className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
                                 required
                             />
@@ -151,7 +161,7 @@ export default function AppointmentFormLayout({
                     {/* Tech & Message */}
                     <div>
                         <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Preferred Tech <span className="text-gray-400 text-sm">(optional)</span>
+                            Preferred Tech {<span className="text-gray-400 text-sm">(optional)</span>}
                         </label>
                         <input
                             type="text"

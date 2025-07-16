@@ -31,6 +31,10 @@ export default function AppointmentForm() {
   const [submitting, setSubmitting] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<Record<string, number>>({});
 
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const nextYear = currentYear + 1;
+
   useEffect(() => {
     if (!form.date) return;
     fetchBookedSlots(form.date).then(setBookedSlots);
@@ -52,6 +56,7 @@ export default function AppointmentForm() {
 
       setForm((prev) => ({ ...prev, phone: formatted }));
       setPhoneError(digits.length === 10 ? '' : 'Please enter a valid 10-digit phone number.');
+
     } else if (name === 'email') {
       setForm((prev) => ({ ...prev, email: value }));
 
@@ -66,7 +71,18 @@ export default function AppointmentForm() {
       } else {
         setEmailError('');
       }
-    } else {
+
+    } else if (name === 'date') {
+      const selected = new Date(value);
+      const maxAllowed = new Date(`${nextYear}-12-31`);
+      const today = new Date();
+
+      if (selected < today || selected > maxAllowed) return;
+
+      setForm((prev) => ({ ...prev, [name]: value }));
+    }
+
+    else {
       setForm((prev) => ({ ...prev, [name]: value }))
     }
   };
