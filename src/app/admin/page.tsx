@@ -61,7 +61,7 @@ export default function AdminDashboard() {
 
 
   return (
-    <main className="min-h-screen pt-8 max-w-6xl mx-auto bg-gray-100/50">
+    <main className="min-h-screen pt-8 max-w-6xl mx-auto bg-gray-100/50 pb-12">
       {/* Header */}
       <div className="sticky top-0 z-10 to-transparent py-4 px-4 backdrop-blur-sm rounded-md flex justify-between items-center shadow-md mb-6">
         <h1 className="text-2xl md:text-3xl font-bold text-red-500">Admin Dashboard</h1>
