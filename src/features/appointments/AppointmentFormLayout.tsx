@@ -16,6 +16,7 @@ interface AppointmentFormLayoutProps {
     emailError: string;
     phoneError: string;
     submitting: boolean;
+    formValid: boolean;
     handleChange: (
         e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
     ) => void;
@@ -29,12 +30,12 @@ export default function AppointmentFormLayout({
     emailError,
     phoneError,
     submitting,
+    formValid,
     handleChange,
     handleSubmit,
     getAvailableTimes,
     formatTime,
 }: AppointmentFormLayoutProps) {
-
     const today = new Date();
     const currentYear = today.getFullYear();
     const nextYear = currentYear + 1;
@@ -42,18 +43,18 @@ export default function AppointmentFormLayout({
     const minDate = today.toISOString().split('T')[0];
     const maxDate = `${nextYear}-12-31`;
 
-
     return (
-        <main className="min-h-screen pt-20 px-4 bg-gray-50">
+        <main className="min-h-screen pt-20 px-4 bg-gray-50 pb-12">
             <FadeInDown>
-                <h1 className="text-4xl font-bold text-center text-red-600 mb-16">Book an Appointment</h1>
+                <h1 className="text-4xl font-bold text-center text-red-600 mb-16">
+                    Book an Appointment
+                </h1>
             </FadeInDown>
 
             <div className="max-w-xl mx-auto bg-white p-8 shadow-lg rounded-lg">
                 <form className="space-y-6" onSubmit={handleSubmit}>
                     <p className="text-sm text-gray-500 mb-2 text-center">
                         Fields marked with <span className="text-red-500">*</span> are required. <br />
-                        Email is only required for auto confirmation via email.
                     </p>
 
                     {/* Name Fields */}
@@ -88,7 +89,7 @@ export default function AppointmentFormLayout({
 
                     {/* Contact */}
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Email {<span className="text-gray-400 text-sm">(optional: Used for appointment confirmation)</span>}</label>
                         <input
                             type="email"
                             name="email"
@@ -97,7 +98,7 @@ export default function AppointmentFormLayout({
                             className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
                         />
                         {emailError && (
-                            <p className='text-sm text-red-500 mt-1'>{emailError}</p>
+                            <p className="text-sm text-red-500 mt-1">{emailError}</p>
                         )}
                     </div>
                     <div>
@@ -185,8 +186,11 @@ export default function AppointmentFormLayout({
 
                     <button
                         type="submit"
-                        disabled={submitting}
-                        className="w-full bg-red-600 text-white py-3 rounded-lg font-semibold hover:bg-red-700 transition disabled:opacity-60"
+                        disabled={!formValid}
+                        className={`w-full py-3 rounded-lg font-semibold transition ${formValid
+                            ? 'bg-red-600 text-white hover:bg-red-700'
+                            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                            }`}
                     >
                         {submitting ? 'Sending...' : 'Submit Appointment'}
                     </button>

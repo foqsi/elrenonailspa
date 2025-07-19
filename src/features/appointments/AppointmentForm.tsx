@@ -12,6 +12,16 @@ import { AppointmentFormData } from './types';
 import AppointmentFormLayout from './AppointmentFormLayout';
 import { toast } from 'react-hot-toast';
 import { SALON_ID } from '@/lib/constants';
+import ConfirmModal from '@/components/modals/ConfirmModal'; // You’ll need to create this
+
+const knownDomains = [
+  'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com',
+  'aol.com', 'me.com', 'live.com', 'msn.com', 'mail.com',
+  'protonmail.com', 'gmx.com', 'zoho.com', 'yandex.com', 'fastmail.com',
+  'tutanota.com', 'hey.com', 'pm.me',
+  'comcast.net', 'att.net', 'cox.net', 'verizon.net', 'bellsouth.net',
+  'sbcglobal.net', 'shaw.ca', 'rogers.com', 'btinternet.com', 'sky.com',
+];
 
 export default function AppointmentForm() {
   const [form, setForm] = useState<AppointmentFormData>({
@@ -30,6 +40,8 @@ export default function AppointmentForm() {
   const [phoneError, setPhoneError] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<Record<string, number>>({});
+  const [showUnknownEmailModal, setShowUnknownEmailModal] = useState(false);
+  const [pendingSubmission, setPendingSubmission] = useState(false);
 
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -56,34 +68,24 @@ export default function AppointmentForm() {
 
       setForm((prev) => ({ ...prev, phone: formatted }));
       setPhoneError(digits.length === 10 ? '' : 'Please enter a valid 10-digit phone number.');
-
     } else if (name === 'email') {
       setForm((prev) => ({ ...prev, email: value }));
 
-      const validDomains = ['gmail.com', 'yahoo.com', 'outlook.com', 'icloud.com', 'hotmail.com'];
       const emailParts = value.split('@');
-
-      if (
-        emailParts.length !== 2 ||
-        !validDomains.includes(emailParts[1].toLowerCase())
-      ) {
+      if (emailParts.length !== 2 || !emailParts[1].includes('.')) {
         setEmailError('Please enter a valid email.');
       } else {
         setEmailError('');
       }
-
     } else if (name === 'date') {
       const selected = new Date(value);
       const maxAllowed = new Date(`${nextYear}-12-31`);
       const today = new Date();
-
       if (selected < today || selected > maxAllowed) return;
 
       setForm((prev) => ({ ...prev, [name]: value }));
-    }
-
-    else {
-      setForm((prev) => ({ ...prev, [name]: value }))
+    } else {
+      setForm((prev) => ({ ...prev, [name]: value }));
     }
   };
 
@@ -122,21 +124,38 @@ export default function AppointmentForm() {
     return times;
   };
 
+  const formValid =
+    form.firstName.trim() !== '' &&
+    form.lastName.trim() !== '' &&
+    form.phone.replace(/\D/g, '').length === 10 &&
+    form.date !== '' &&
+    form.time !== '' &&
+    (form.email.trim() === '' || emailError === '') &&
+    phoneError === '' &&
+    !submitting;
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitting(true);
 
-    const phoneDigits = form.phone.replace(/\D/g, '');
-    if (phoneDigits.length !== 10) {
-      setPhoneError('Please enter a valid 10-digit phone number.');
-      setSubmitting(false);
+    // Skip if invalid
+    if (!formValid) return;
+
+    // Check if email domain is in the trusted list
+    const emailParts = form.email.toLowerCase().split('@');
+    const domain = emailParts[1] || '';
+
+    if (form.email && !knownDomains.includes(domain)) {
+      setShowUnknownEmailModal(true);
+      setPendingSubmission(true);
       return;
     }
 
-    if (emailError) {
-      setSubmitting(false);
-    }
+    await actuallySubmitForm();
+  };
 
+  const actuallySubmitForm = async () => {
+    setSubmitting(true);
+    const phoneDigits = form.phone.replace(/\D/g, '');
     const selectedTime = normalizeTime(form.time);
 
     const submission: AppointmentFormData = {
@@ -173,19 +192,36 @@ export default function AppointmentForm() {
       }
     } finally {
       setSubmitting(false);
+      setShowUnknownEmailModal(false);
+      setPendingSubmission(false);
     }
   };
 
   return (
-    <AppointmentFormLayout
-      form={form}
-      emailError={emailError}
-      phoneError={phoneError}
-      submitting={submitting}
-      handleChange={handleChange}
-      handleSubmit={handleSubmit}
-      getAvailableTimes={getAvailableTimes}
-      formatTime={formatTime}
-    />
+    <>
+      <AppointmentFormLayout
+        form={form}
+        emailError={emailError}
+        phoneError={phoneError}
+        submitting={submitting}
+        handleChange={handleChange}
+        handleSubmit={handleSubmit}
+        getAvailableTimes={getAvailableTimes}
+        formatTime={formatTime}
+        formValid={formValid}
+      />
+
+      {showUnknownEmailModal && (
+        <ConfirmModal
+          title="Unrecognized Email Domain"
+          message={`The email you entered uses "${form.email.split('@')[1]}" which is not in our list of known providers. Are you sure it's correct?`}
+          onConfirm={actuallySubmitForm}
+          onCancel={() => {
+            setShowUnknownEmailModal(false);
+            setPendingSubmission(false);
+          }}
+        />
+      )}
+    </>
   );
 }
