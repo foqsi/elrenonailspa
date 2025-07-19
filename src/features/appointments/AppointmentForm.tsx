@@ -12,7 +12,7 @@ import { AppointmentFormData } from './types';
 import AppointmentFormLayout from './AppointmentFormLayout';
 import { toast } from 'react-hot-toast';
 import { SALON_ID } from '@/lib/constants';
-import ConfirmModal from '@/components/modals/ConfirmModal'; // You’ll need to create this
+import ConfirmModal from '@/components/modals/ConfirmModal';
 
 const knownDomains = [
   'gmail.com', 'yahoo.com', 'outlook.com', 'hotmail.com', 'icloud.com',
@@ -41,7 +41,6 @@ export default function AppointmentForm() {
   const [submitting, setSubmitting] = useState(false);
   const [bookedSlots, setBookedSlots] = useState<Record<string, number>>({});
   const [showUnknownEmailModal, setShowUnknownEmailModal] = useState(false);
-  const [pendingSubmission, setPendingSubmission] = useState(false);
 
   const today = new Date();
   const currentYear = today.getFullYear();
@@ -137,16 +136,13 @@ export default function AppointmentForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Skip if invalid
     if (!formValid) return;
 
-    // Check if email domain is in the trusted list
     const emailParts = form.email.toLowerCase().split('@');
     const domain = emailParts[1] || '';
 
     if (form.email && !knownDomains.includes(domain)) {
       setShowUnknownEmailModal(true);
-      setPendingSubmission(true);
       return;
     }
 
@@ -193,7 +189,6 @@ export default function AppointmentForm() {
     } finally {
       setSubmitting(false);
       setShowUnknownEmailModal(false);
-      setPendingSubmission(false);
     }
   };
 
@@ -216,10 +211,7 @@ export default function AppointmentForm() {
           title="Unrecognized Email Domain"
           message={`The email you entered uses "${form.email.split('@')[1]}" which is not in our list of known providers. Are you sure it's correct?`}
           onConfirm={actuallySubmitForm}
-          onCancel={() => {
-            setShowUnknownEmailModal(false);
-            setPendingSubmission(false);
-          }}
+          onCancel={() => setShowUnknownEmailModal(false)}
         />
       )}
     </>

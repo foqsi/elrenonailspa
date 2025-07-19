@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+
 interface ConfirmModalProps {
   title: string;
   message: string;
@@ -8,6 +10,26 @@ interface ConfirmModalProps {
 }
 
 export default function ConfirmModal({ title, message, onConfirm, onCancel }: ConfirmModalProps) {
+  const [countdown, setCountdown] = useState(5);
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    setCountdown(5);
+    setReady(false);
+    const interval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev === 1) {
+          clearInterval(interval);
+          setReady(true);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center">
       <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6">
@@ -21,10 +43,14 @@ export default function ConfirmModal({ title, message, onConfirm, onCancel }: Co
             Go Back
           </button>
           <button
-            className="px-4 py-2 rounded bg-red-600 text-white hover:bg-red-700 text-sm"
+            disabled={!ready}
             onClick={onConfirm}
+            className={`px-4 py-2 rounded text-sm transition ${ready
+                ? 'bg-red-600 text-white hover:bg-red-700'
+                : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              }`}
           >
-            Continue
+            {ready ? 'Continue' : `Wait (${countdown})`}
           </button>
         </div>
       </div>
