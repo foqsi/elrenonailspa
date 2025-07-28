@@ -1,4 +1,3 @@
-'use client';
 
 import FadeInSection from '@/components/animations/FadeUpSection';
 import { Element } from 'react-scroll';
