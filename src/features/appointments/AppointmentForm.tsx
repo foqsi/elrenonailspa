@@ -23,6 +23,21 @@ const knownDomains = [
   'sbcglobal.net', 'shaw.ca', 'rogers.com', 'btinternet.com', 'sky.com',
 ];
 
+// === Lead-time settings ===
+const MIN_LEAD_MINUTES = 120; // 2 hours
+function nowPlusLead() {
+  const d = new Date();
+  d.setMinutes(d.getMinutes() + MIN_LEAD_MINUTES, 0, 0);
+  return d;
+}
+
+// === Date helpers (compare by day, not by time) ===
+function startOfDay(d: Date) {
+  const x = new Date(d);
+  x.setHours(0, 0, 0, 0);
+  return x;
+}
+
 export default function AppointmentForm() {
   const [form, setForm] = useState<AppointmentFormData>({
     firstName: '',
@@ -77,10 +92,13 @@ export default function AppointmentForm() {
         setEmailError('');
       }
     } else if (name === 'date') {
-      const selected = new Date(value);
-      const maxAllowed = new Date(`${nextYear}-12-31`);
-      const today = new Date();
-      if (selected < today || selected > maxAllowed) return;
+      // Compare using start-of-day to allow selecting "today"
+      const selected = new Date(value + 'T00:00:00');
+      const minAllowed = startOfDay(new Date()); // today at 00:00
+      const maxAllowed = new Date(nextYear, 11, 31); // Dec 31 of next year (local)
+
+      if (startOfDay(selected) < minAllowed) return;       // disallow past days
+      if (startOfDay(selected) > startOfDay(maxAllowed)) return; // disallow after max
 
       setForm((prev) => ({ ...prev, [name]: value }));
     } else {
@@ -92,13 +110,13 @@ export default function AppointmentForm() {
     if (!form.date) return [];
 
     const selectedDate = new Date(form.date + 'T00:00:00');
-    const today = new Date();
-    const isToday = selectedDate.toDateString() === today.toDateString();
+    const isSameDay = startOfDay(selectedDate).getTime() === startOfDay(new Date()).getTime();
 
     const day = selectedDate.getDay();
-    const startHour = day === 0 ? 12 : 10;
+    const startHour = day === 0 ? 12 : 10; // Sunday 12–17, others 10–18
     const endHour = day === 0 ? 17 : 18;
 
+    const cutoff = nowPlusLead(); // now + 2 hours
     const times: string[] = [];
 
     for (let hour = startHour; hour <= endHour; hour++) {
@@ -107,13 +125,14 @@ export default function AppointmentForm() {
         const m = min.toString().padStart(2, '0');
         const timeStr = `${h}:${m}:00`;
 
-        if (isToday) {
-          const now = new Date();
-          const candidate = new Date();
-          candidate.setHours(hour, min, 0, 0);
-          if (candidate <= now) continue;
-        }
+        // Date for this slot on the selected day
+        const candidate = new Date(selectedDate);
+        candidate.setHours(hour, min, 0, 0);
 
+        // Enforce 4-hour lead time only for today
+        if (isSameDay && candidate <= cutoff) continue;
+
+        // Capacity rule
         if (!bookedSlots[timeStr] || bookedSlots[timeStr] < 5) {
           times.push(timeStr);
         }
@@ -135,8 +154,19 @@ export default function AppointmentForm() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-
     if (!formValid) return;
+
+    // Enforce 4-hour lead time at submit time
+    if (form.date && form.time) {
+      const [hh, mm] = form.time.split(':').map(Number);
+      const slotDate = new Date(form.date + 'T00:00:00');
+      slotDate.setHours(hh, mm, 0, 0);
+
+      if (slotDate <= nowPlusLead()) {
+        toast.error('Appointments must be booked at least 4 hours in advance.');
+        return;
+      }
+    }
 
     const emailParts = form.email.toLowerCase().split('@');
     const domain = emailParts[1] || '';
