@@ -21,7 +21,8 @@ export async function fetchBookedSlots(date: string) {
   const { data } = await supabase
     .from('appointments')
     .select('time')
-    .eq('date', date);
+    .eq('date', date)
+    .eq('salon_id', SALON_ID);
 
   const slotCount: Record<string, number> = {};
   data?.forEach(({ time }) => {
@@ -32,33 +33,125 @@ export async function fetchBookedSlots(date: string) {
   return slotCount;
 }
 
+export async function findCustomerByPhone(rawPhone: string) {
+  const phoneDigits = rawPhone.replace(/\D/g, '');
+  if (phoneDigits.length !== 10) return null;
+
+  const { data, error } = await supabase
+    .from('customers')
+    .select('id, first_name, last_name, email, phone')
+    .eq('salon_id', SALON_ID)
+    .eq('phone', phoneDigits)
+    .maybeSingle();
+
+  if (error) {
+    console.error('findCustomerByPhone error:', error.message);
+    return null;
+  }
+  if (!data) return null;
+
+  return {
+    id: data.id as string,
+    firstName: data.first_name || '',
+    lastName: data.last_name || '',
+    email: data.email || '',
+    phone: data.phone || phoneDigits,
+  };
+}
+
+export async function upsertCustomer(payload: {
+  firstName?: string;
+  lastName?: string;
+  email?: string | null;
+  phone: string;
+}) {
+  const phoneDigits = payload.phone.replace(/\D/g, '');
+  const { data: existing, error: findErr } = await supabase
+    .from('customers')
+    .select('id, first_name, last_name, email')
+    .eq('salon_id', SALON_ID)
+    .eq('phone', phoneDigits)
+    .maybeSingle();
+
+  if (findErr) throw findErr;
+
+  if (existing) {
+    const newFirst = payload.firstName?.trim() || existing.first_name;
+    const newLast = payload.lastName?.trim() || existing.last_name;
+    const newEmail = (payload.email ?? existing.email) || null;
+
+    if (
+      newFirst !== existing.first_name ||
+      newLast !== existing.last_name ||
+      newEmail !== existing.email
+    ) {
+      const { error: updErr } = await supabase
+        .from('customers')
+        .update({
+          first_name: newFirst,
+          last_name: newLast,
+          email: newEmail,
+        })
+        .eq('id', existing.id);
+      if (updErr) throw updErr;
+    }
+    return existing.id as string;
+  }
+
+  const { data: created, error: insErr } = await supabase
+    .from('customers')
+    .insert([
+      {
+        salon_id: SALON_ID,
+        phone: phoneDigits,
+        email: payload.email || null,
+        first_name: (payload.firstName && payload.firstName.trim()) || 'Guest',
+        last_name: (payload.lastName && payload.lastName.trim()) || 'Customer',
+      },
+    ])
+    .select('id')
+    .single();
+
+  if (insErr) throw insErr;
+  return created!.id as string;
+}
+
 export async function submitAppointment(form: AppointmentFormData) {
   const selectedTime = normalizeTime(form.time);
   const phoneDigits = form.phone.replace(/\D/g, '');
 
-  const { data: existing } = await supabase
+  const { data: existing, error: capErr } = await supabase
     .from('appointments')
     .select('id')
     .eq('date', form.date)
-    .eq('time', selectedTime);
-
+    .eq('time', selectedTime)
+    .eq('salon_id', SALON_ID);
+  if (capErr) throw capErr;
   if (existing && existing.length >= 5) {
     throw new Error('Slot full');
   }
+
+  const customerId = await upsertCustomer({
+    firstName: capitalize(form.firstName),
+    lastName: capitalize(form.lastName),
+    email: form.email?.trim() ? form.email.trim() : null,
+    phone: phoneDigits,
+  });
 
   const { error, data, status } = await supabase
     .from('appointments')
     .insert([
       {
+        customer_id: customerId,
+        salon_id: SALON_ID,
+        date: form.date,
+        time: selectedTime,
+        tech: capitalize(form.tech),
+        message: form.message,
         first_name: capitalize(form.firstName),
         last_name: capitalize(form.lastName),
         email: form.email || null,
         phone: phoneDigits,
-        tech: capitalize(form.tech),
-        message: form.message,
-        date: form.date,
-        time: selectedTime,
-        salon_id: SALON_ID
       },
     ])
     .select();

@@ -6,3 +6,5 @@ export { default as CallToAction } from './CallToAction';
 export { default as Display } from './Display';
 export { default as Environment } from './Environment';
 export { default as Landing } from './Landing';
+export { default as BackgroundVideo } from './BackgroundVideo';
+export { default as Video } from './Video';
