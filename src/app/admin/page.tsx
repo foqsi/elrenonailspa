@@ -9,14 +9,15 @@ import Throbber from '@/components/Throbber';
 import AppointmentsViewer from '@/components/admin/AppointmentViewer';
 import CategoryEditor from '@/components/admin/CategoryEditor';
 
-type AdminTab = 'gallery' | 'services' | 'promo' | 'appointments';
+type AdminTab = 'gallery' | 'services' | 'promo' | 'customers';
 type ServicesSubTab = 'services' | 'categories';
+type CustomersSubTab = 'appointments' | 'customers';
 
 const tabs: { key: AdminTab; label: string }[] = [
   { key: 'gallery', label: 'Gallery' },
   { key: 'services', label: 'Services' },
   { key: 'promo', label: 'Banner' },
-  { key: 'appointments', label: 'Appointments' },
+  { key: 'customers', label: 'Customers' },
 ];
 
 
@@ -25,6 +26,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState<AdminTab>('gallery');
   const [servicesSubTab, setServicesSubTab] = useState<ServicesSubTab>('services');
   const [galleryUpdated, setGalleryUpdated] = useState(false);
+  const [customersSubTab, setCustomersSubTab] = useState<CustomersSubTab>('appointments');
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
@@ -81,6 +83,7 @@ export default function AdminDashboard() {
             onClick={() => {
               handleTabChange(tab.key);
               setServicesSubTab('services');
+              setCustomersSubTab('appointments');
             }}
             className={`px-4 py-2 font-medium border-b-2 transition-colors duration-200 bg-gray-100 ${activeTab === tab.key
               ? 'border-red-600 text-red-600'
@@ -132,10 +135,35 @@ export default function AdminDashboard() {
           </section>
         )}
 
-        {activeTab === 'appointments' && (
-          <section className="px-4">
-            <h2 className="text-xl font-semibold mb-4 text-red-600 text-center">View Appointments</h2>
-            <AppointmentsViewer />
+        {activeTab === 'customers' && (
+          <section className="px-4 w-full">
+            <h2 className="text-xl font-semibold mb-4 text-red-600 text-center">Customers</h2>
+
+            {/* Customers Sub Tabs */}
+            <div className="flex justify-center gap-2 mb-6">
+              {(['appointments', 'customers'] as CustomersSubTab[]).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setCustomersSubTab(key)}
+                  className={`px-3 py-1 rounded-md font-medium transition ${customersSubTab === key
+                    ? 'bg-red-600 text-white shadow'
+                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                    }`}
+                >
+                  {key === 'appointments' ? 'View Appointments' : 'View Customers'}
+                </button>
+              ))}
+            </div>
+
+            {customersSubTab === 'appointments' && <AppointmentsViewer />}
+
+            {customersSubTab === 'customers' && (
+              <div className="bg-white rounded-lg p-6 shadow">
+                <p className="text-gray-600 text-center italic">
+                  Customers view coming soon.
+                </p>
+              </div>
+            )}
           </section>
         )}
 
