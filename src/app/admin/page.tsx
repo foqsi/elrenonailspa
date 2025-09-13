@@ -8,6 +8,7 @@ import GalleryManager from '@/components/admin/GalleryManager';
 import Throbber from '@/components/Throbber';
 import AppointmentsViewer from '@/components/admin/AppointmentViewer';
 import CategoryEditor from '@/components/admin/CategoryEditor';
+import CustomerEditor from '@/components/admin/CustomerEditor';
 
 type AdminTab = 'gallery' | 'services' | 'promo' | 'customers';
 type ServicesSubTab = 'services' | 'categories';
@@ -157,13 +158,7 @@ export default function AdminDashboard() {
 
             {customersSubTab === 'appointments' && <AppointmentsViewer />}
 
-            {customersSubTab === 'customers' && (
-              <div className="bg-white rounded-lg p-6 shadow">
-                <p className="text-gray-600 text-center italic">
-                  Customers view coming soon.
-                </p>
-              </div>
-            )}
+            {customersSubTab === 'customers' && <CustomerEditor />}
           </section>
         )}
 

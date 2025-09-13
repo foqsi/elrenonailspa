@@ -119,6 +119,7 @@ export default function AppointmentFormLayout({
                                     name="firstName"
                                     value={form.firstName}
                                     onChange={handleChange}
+                                    disabled={customerFound}
                                     className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
                                     required
                                 />
@@ -132,6 +133,7 @@ export default function AppointmentFormLayout({
                                     name="lastName"
                                     value={form.lastName}
                                     onChange={handleChange}
+                                    disabled={customerFound}
                                     className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
                                     required
                                 />
@@ -147,10 +149,18 @@ export default function AppointmentFormLayout({
                                 name="email"
                                 value={form.email}
                                 onChange={handleChange}
+                                disabled={customerFound}
                                 className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
                             />
                             {emailError && <p className="text-sm text-red-500 mt-1">{emailError}</p>}
                         </div>
+
+                        {customerFound && (
+                            <p className="mt-3 text-xs text-gray-600 italic text-center" role="note" aria-live="polite">
+                                If any of the above information is incorrect, please let our staff know to update it.
+                            </p>
+                        )}
+
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
                             <div>

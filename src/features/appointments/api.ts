@@ -127,9 +127,7 @@ export async function submitAppointment(form: AppointmentFormData) {
     .eq('time', selectedTime)
     .eq('salon_id', SALON_ID);
   if (capErr) throw capErr;
-  if (existing && existing.length >= 5) {
-    throw new Error('Slot full');
-  }
+  if (existing && existing.length >= 5) throw new Error('Slot full');
 
   const customerId = await upsertCustomer({
     firstName: capitalize(form.firstName),
@@ -140,25 +138,36 @@ export async function submitAppointment(form: AppointmentFormData) {
 
   const { error, data, status } = await supabase
     .from('appointments')
-    .insert([
-      {
-        customer_id: customerId,
-        salon_id: SALON_ID,
-        date: form.date,
-        time: selectedTime,
-        tech: capitalize(form.tech),
-        message: form.message,
-        first_name: capitalize(form.firstName),
-        last_name: capitalize(form.lastName),
-        email: form.email || null,
-        phone: phoneDigits,
-      },
-    ])
+    .insert([{
+      customer_id: customerId,
+      salon_id: SALON_ID,
+      date: form.date,
+      time: selectedTime,
+      tech: capitalize(form.tech),
+      message: form.message,
+      first_name: capitalize(form.firstName),
+      last_name: capitalize(form.lastName),
+      email: form.email || null,
+      phone: phoneDigits,
+    }])
     .select();
 
-  if (error || status >= 400) {
-    throw new Error(error?.message || 'Failed to insert');
-  }
+  if (error || status >= 400) throw new Error(error?.message || 'Failed to insert');
+
+  // ---- NEW: bump customers.last_visit to the scheduled visit datetime ----
+  // Build a local Date from date (YYYY-MM-DD) + time (HH:MM:SS), then to ISO.
+  const visitLocal = new Date(`${form.date}T${selectedTime}`);
+  const visitISO = visitLocal.toISOString();
+
+  // Only update if it's newer than what's stored (or if null)
+  await supabase
+    .from('customers')
+    .update({ last_visit: visitISO })
+    .eq('id', customerId)
+    .eq('salon_id', SALON_ID)
+    .or(`last_visit.is.null,last_visit.lt.${visitISO}`);
+
+  // -----------------------------------------------------------------------
 
   const templateParams = {
     firstName: capitalize(form.firstName),
@@ -174,12 +183,7 @@ export async function submitAppointment(form: AppointmentFormData) {
   const isValidEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email);
   const templateId = isValidEmail ? 'template_ywly2ji' : 'template_uhpnfar';
 
-  await emailjs.send(
-    'service_oc3tvfe',
-    templateId,
-    templateParams,
-    'xTe_0sirIJPRptXcd'
-  );
+  await emailjs.send('service_oc3tvfe', templateId, templateParams, 'xTe_0sirIJPRptXcd');
 
   return data;
 }

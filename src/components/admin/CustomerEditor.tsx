@@ -5,6 +5,7 @@ import { supabase } from '@/lib/supabaseClient';
 import toast from 'react-hot-toast';
 import { SALON_ID } from '@/lib/constants';
 import Throbber from '../Throbber';
+import { formatZoned, formatZonedDate } from '@/lib/formattime';
 
 type Customer = {
   id: string;
@@ -21,10 +22,9 @@ type Customer = {
 function digitsOnly(v: string) {
   return v.replace(/\D/g, '');
 }
-
 function formatPhoneForDisplay(d: string) {
   const v = digitsOnly(d);
-  if (v.length !== 10) return d;
+  if (v.length !== 10) return d || '';
   return `(${v.slice(0, 3)}) ${v.slice(3, 6)}-${v.slice(6)}`;
 }
 
@@ -33,6 +33,8 @@ export default function CustomerEditor() {
   const [loading, setLoading] = useState(true);
   const [newRow, setNewRow] = useState<Partial<Customer>>({});
   const [query, setQuery] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [draft, setDraft] = useState<Partial<Customer>>({});
 
   useEffect(() => {
     fetchCustomers();
@@ -97,6 +99,8 @@ export default function CustomerEditor() {
     const payload = {
       ...row,
       phone: digitsOnly(row.phone),
+      email: row.email?.trim() || null,
+      notes: row.notes?.trim() || null,
     };
 
     const res = await fetch('/api/admin/customers/update', {
@@ -113,6 +117,8 @@ export default function CustomerEditor() {
     }
 
     toast.success('Customer updated!');
+    setEditingId(null);
+    setDraft({});
     fetchCustomers();
   }
 
@@ -131,24 +137,60 @@ export default function CustomerEditor() {
     }
 
     toast.success('Customer deleted.');
+    if (editingId === id) {
+      setEditingId(null);
+      setDraft({});
+    }
     fetchCustomers();
   }
 
   const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
+    const raw = query ?? '';
+    const q = raw.trim().toLowerCase();
     if (!q) return rows;
+    const qDigits = q.replace(/\D/g, '');
+    const hasDigits = qDigits.length > 0;
+
     return rows.filter((r) => {
       const name = `${r.first_name} ${r.last_name}`.toLowerCase();
-      return (
-        name.includes(q) ||
-        (r.email || '').toLowerCase().includes(q) ||
-        digitsOnly(r.phone).includes(digitsOnly(q))
-      );
+      const email = (r.email || '').toLowerCase();
+      const nameOrEmailMatch = name.includes(q) || email.includes(q);
+      const phoneMatch = hasDigits && r.phone.replace(/\D/g, '').includes(qDigits);
+      return nameOrEmailMatch || phoneMatch;
     });
   }, [rows, query]);
 
+  const startEdit = (c: Customer) => {
+    setEditingId(c.id);
+    setDraft({
+      ...c,
+      phone: formatPhoneForDisplay(c.phone),
+    });
+  };
+  const cancelEdit = () => {
+    setEditingId(null);
+    setDraft({});
+  };
+  const saveEdit = () => {
+    if (!editingId) return;
+    const base = rows.find((r) => r.id === editingId);
+    if (!base) return;
+    const merged: Customer = {
+      ...base,
+      first_name: (draft.first_name ?? base.first_name) as string,
+      last_name: (draft.last_name ?? base.last_name) as string,
+      email: (draft.email ?? base.email) as string | null,
+      phone: (draft.phone ?? base.phone) as string,
+      marketing_opt_in: (draft.marketing_opt_in ?? base.marketing_opt_in) as boolean,
+      notes: (draft.notes ?? base.notes) as string | null,
+      // keep id/last_visit/created_at from base
+    };
+    handleUpdate(merged);
+  };
+
   return (
     <div className="space-y-8">
+      {/* Add Customer */}
       <div className="bg-white p-4 sm:p-6 rounded shadow-md">
         <h3 className="text-lg font-bold mb-3">Add Customer</h3>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-6">
@@ -203,6 +245,7 @@ export default function CustomerEditor() {
         />
       </div>
 
+      {/* List + Search */}
       <div className="bg-white p-4 sm:p-6 rounded shadow-md">
         <div className="flex flex-col sm:flex-row gap-2 sm:items-center sm:justify-between">
           <h3 className="text-lg font-bold">Customers</h3>
@@ -216,7 +259,8 @@ export default function CustomerEditor() {
         </div>
       </div>
 
-      <div className="max-h-[600px] overflow-y-auto pr-1 space-y-4 border rounded bg-white p-4">
+      {/* Cards */}
+      <div className="max-h-[600px] overflow-y-auto pr-1 space-y-4">
         {loading ? (
           <div className="flex justify-center items-center">
             <Throbber />
@@ -224,88 +268,145 @@ export default function CustomerEditor() {
         ) : filtered.length === 0 ? (
           <div className="text-center text-gray-500">No customers found.</div>
         ) : (
-          filtered.map((c) => (
-            <div
-              key={c.id}
-              className="bg-white p-3 sm:p-4 border rounded-md shadow-sm grid gap-2 sm:grid-cols-12 items-start"
-            >
-              <input
-                type="text"
-                className="border p-2 rounded w-full sm:col-span-2"
-                value={c.first_name}
-                onChange={(e) =>
-                  setRows((prev) => prev.map((r) => (r.id === c.id ? { ...r, first_name: e.target.value } : r)))
-                }
-              />
-              <input
-                type="text"
-                className="border p-2 rounded w-full sm:col-span-2"
-                value={c.last_name}
-                onChange={(e) =>
-                  setRows((prev) => prev.map((r) => (r.id === c.id ? { ...r, last_name: e.target.value } : r)))
-                }
-              />
-              <input
-                type="tel"
-                className="border p-2 rounded w-full sm:col-span-2"
-                value={formatPhoneForDisplay(c.phone)}
-                onChange={(e) =>
-                  setRows((prev) => prev.map((r) => (r.id === c.id ? { ...r, phone: e.target.value } : r)))
-                }
-              />
-              <input
-                type="email"
-                className="border p-2 rounded w-full sm:col-span-3"
-                value={c.email ?? ''}
-                onChange={(e) =>
-                  setRows((prev) => prev.map((r) => (r.id === c.id ? { ...r, email: e.target.value } : r)))
-                }
-              />
-              <label className="flex items-center gap-2 text-sm text-gray-700 sm:col-span-1">
-                <input
-                  type="checkbox"
-                  checked={!!c.marketing_opt_in}
-                  onChange={(e) =>
-                    setRows((prev) => prev.map((r) => (r.id === c.id ? { ...r, marketing_opt_in: e.target.checked } : r)))
-                  }
-                />
-                Opt-in
-              </label>
-              <textarea
-                className="border p-2 rounded w-full sm:col-span-12"
-                placeholder="Notes"
-                value={c.notes ?? ''}
-                onChange={(e) =>
-                  setRows((prev) => prev.map((r) => (r.id === c.id ? { ...r, notes: e.target.value } : r)))
-                }
-              />
-              <div className="sm:col-span-12 flex flex-wrap gap-2 justify-end">
-                <div className="text-xs text-gray-500 mr-auto">
-                  Last visit: {c.last_visit ? new Date(c.last_visit).toLocaleString() : '—'} · Created:{' '}
-                  {new Date(c.created_at).toLocaleDateString()}
+          filtered.map((c) => {
+            const isEditing = editingId === c.id;
+            const cardClasses = isEditing
+              ? 'bg-white border rounded shadow-sm'
+              : 'bg-gray-50 border border-gray-200 rounded shadow-sm opacity-90';
+            return (
+              <div key={c.id} className={`${cardClasses} p-3 sm:p-4 grid gap-3`}>
+                {/* Row 1: Name + Phone + Email */}
+                <div className="grid gap-2 sm:grid-cols-12 items-start">
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs text-gray-500 mb-1">First name</label>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        className="border p-2 rounded w-full"
+                        value={(draft.first_name as string) ?? c.first_name}
+                        onChange={(e) => setDraft((d) => ({ ...d, first_name: e.target.value }))}
+                      />
+                    ) : (
+                      <div className="p-2 rounded bg-gray-100">{c.first_name}</div>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs text-gray-500 mb-1">Last name</label>
+                    {isEditing ? (
+                      <input
+                        type="text"
+                        className="border p-2 rounded w-full"
+                        value={(draft.last_name as string) ?? c.last_name}
+                        onChange={(e) => setDraft((d) => ({ ...d, last_name: e.target.value }))}
+                      />
+                    ) : (
+                      <div className="p-2 rounded bg-gray-100">{c.last_name}</div>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-2">
+                    <label className="block text-xs text-gray-500 mb-1">Phone</label>
+                    {isEditing ? (
+                      <input
+                        type="tel"
+                        className="border p-2 rounded w-full"
+                        value={(draft.phone as string) ?? formatPhoneForDisplay(c.phone)}
+                        onChange={(e) => setDraft((d) => ({ ...d, phone: e.target.value }))}
+                      />
+                    ) : (
+                      <div className="p-2 rounded bg-gray-100">{formatPhoneForDisplay(c.phone)}</div>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-3">
+                    <label className="block text-xs text-gray-500 mb-1">Email</label>
+                    {isEditing ? (
+                      <input
+                        type="email"
+                        className="border p-2 rounded w-full"
+                        value={(draft.email as string) ?? c.email ?? ''}
+                        onChange={(e) => setDraft((d) => ({ ...d, email: e.target.value }))}
+                      />
+                    ) : (
+                      <div className="p-2 rounded bg-gray-100">{c.email ?? '—'}</div>
+                    )}
+                  </div>
+
+                  <div className="sm:col-span-1">
+                    <label className="block text-xs text-gray-500 mb-1">Opt-in</label>
+                    {isEditing ? (
+                      <label className="inline-flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={!!((draft.marketing_opt_in as boolean) ?? c.marketing_opt_in)}
+                          onChange={(e) => setDraft((d) => ({ ...d, marketing_opt_in: e.target.checked }))}
+                        />
+                        <span className="text-sm text-gray-700">Marketing</span>
+                      </label>
+                    ) : (
+                      <div className="p-2 rounded bg-gray-100">{c.marketing_opt_in ? 'Yes' : 'No'}</div>
+                    )}
+                  </div>
                 </div>
-                <button
-                  onClick={() =>
-                    handleUpdate({
-                      ...c,
-                      phone: digitsOnly(c.phone),
-                      email: c.email?.trim() || null,
-                      notes: c.notes?.trim() || null,
-                    })
-                  }
-                  className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-500 text-sm"
-                >
-                  Save
-                </button>
-                <button
-                  onClick={() => handleDelete(c.id)}
-                  className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 text-sm"
-                >
-                  Delete
-                </button>
+
+                {/* Row 2: Notes */}
+                <div>
+                  <label className="block text-xs text-gray-500 mb-1">Notes</label>
+                  {isEditing ? (
+                    <textarea
+                      className="border p-2 rounded w-full"
+                      value={(draft.notes as string) ?? c.notes ?? ''}
+                      onChange={(e) => setDraft((d) => ({ ...d, notes: e.target.value }))}
+                    />
+                  ) : (
+                    <div className="p-2 rounded bg-gray-100 min-h-[44px]">
+                      {c.notes || <span className="text-gray-400">—</span>}
+                    </div>
+                  )}
+                </div>
+
+                {/* Footer actions */}
+                <div className="flex flex-wrap gap-2 items-center justify-end">
+                  <div className="text-xs text-gray-500 mr-auto">
+                    Last visit: {c.last_visit ? formatZoned(c.last_visit) : '—'} · Created: {formatZonedDate(c.created_at)}
+                  </div>
+
+                  {!isEditing ? (
+                    <>
+                      <button
+                        onClick={() => startEdit(c)}
+                        className="bg-gray-800 text-white px-3 py-1 rounded hover:bg-gray-700 text-sm"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => handleDelete(c.id)}
+                        className="bg-red-600 text-white px-3 py-1 rounded hover:bg-red-500 text-sm"
+                      >
+                        Delete
+                      </button>
+                    </>
+                  ) : (
+                    <>
+                      <button
+                        onClick={saveEdit}
+                        className="bg-green-600 text-white px-3 py-1 rounded hover:bg-green-500 text-sm"
+                      >
+                        Save
+                      </button>
+                      <button
+                        onClick={cancelEdit}
+                        className="bg-gray-300 text-gray-800 px-3 py-1 rounded hover:bg-gray-200 text-sm"
+                      >
+                        Cancel
+                      </button>
+                    </>
+                  )}
+                </div>
               </div>
-            </div>
-          ))
+            );
+          })
         )}
       </div>
     </div>
