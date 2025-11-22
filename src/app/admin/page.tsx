@@ -9,10 +9,11 @@ import Throbber from '@/components/Throbber';
 import AppointmentsViewer from '@/components/admin/AppointmentViewer';
 import CategoryEditor from '@/components/admin/CategoryEditor';
 import CustomerEditor from '@/components/admin/CustomerEditor';
+import MessagesPanel from '@/components/admin/MessagesPanel';
 
 type AdminTab = 'gallery' | 'services' | 'promo' | 'customers';
 type ServicesSubTab = 'services' | 'categories';
-type CustomersSubTab = 'appointments' | 'customers';
+type CustomersSubTab = 'appointments' | 'customers' | 'messages';
 
 const tabs: { key: AdminTab; label: string }[] = [
   { key: 'gallery', label: 'Gallery' },
@@ -21,6 +22,11 @@ const tabs: { key: AdminTab; label: string }[] = [
   { key: 'customers', label: 'Customers' },
 ];
 
+const CustomersSubTabs: { key: CustomersSubTab; label: string }[] = [
+  { key: 'appointments', label: 'Appointments' },
+  { key: 'customers', label: 'Customers' },
+  { key: 'messages', label: 'Messages' },
+];
 
 export default function AdminDashboard() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -142,23 +148,21 @@ export default function AdminDashboard() {
 
             {/* Customers Sub Tabs */}
             <div className="flex justify-center gap-2 mb-6">
-              {(['appointments', 'customers'] as CustomersSubTab[]).map((key) => (
+              {CustomersSubTabs.map(({ key, label }) => (
                 <button
                   key={key}
                   onClick={() => setCustomersSubTab(key)}
-                  className={`px-3 py-1 rounded-md font-medium transition ${customersSubTab === key
-                    ? 'bg-red-600 text-white shadow'
-                    : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+                  className={`px-3 py-1 rounded-md font-medium transition ${customersSubTab === key ? 'bg-red-600 text-white shadow' : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
                     }`}
                 >
-                  {key === 'appointments' ? 'View Appointments' : 'View Customers'}
+                  {label}
                 </button>
               ))}
             </div>
 
             {customersSubTab === 'appointments' && <AppointmentsViewer />}
-
             {customersSubTab === 'customers' && <CustomerEditor />}
+            {customersSubTab === 'messages' && <MessagesPanel />}
           </section>
         )}
 
