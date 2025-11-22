@@ -52,7 +52,8 @@ export async function GET() {
     };
 
     return NextResponse.json(out);
-  } catch (e: any) {
-    return NextResponse.json({ error: e.message }, { status: 500 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : 'Invalid request';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

@@ -65,7 +65,8 @@ export async function GET(req: NextRequest) {
     }));
 
     return NextResponse.json(shaped, { status: 200 });
-  } catch (e: any) {
-    return NextResponse.json({ error: e?.message || 'Server error' }, { status: 500 });
+  } catch (e: unknown) {
+    const message = e instanceof Error ? e.message : "Invalid request";
+    return NextResponse.json({ error: message || 'Server error' }, { status: 500 });
   }
 }

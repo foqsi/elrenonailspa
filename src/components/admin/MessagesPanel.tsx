@@ -165,8 +165,9 @@ export default function MessagesPanel({ salonId }: { salonId?: string }) {
       }
 
       alert('Send triggered.');
-    } catch (e: any) {
-      alert(e?.message || 'Failed to send.');
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : 'Failed to send.';
+      alert(message || 'Failed to send.');
     } finally {
       setSending(false);
     }
