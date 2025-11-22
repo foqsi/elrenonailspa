@@ -5,6 +5,25 @@ import twilio from 'twilio';
 
 export const runtime = 'nodejs';
 
+export type CustomerRow = {
+  id: string;
+  salon_id: string | null;
+  phone: string | null;
+  email: string | null;
+  first_name: string | null;
+  last_name: string | null;
+  marketing_opt_in: boolean | null;
+  notes: string | null;
+  last_visit: string | null;      // timestamptz returns as string
+  created_at: string;
+  updated_at: string;
+  sms_opt_in: boolean | null;
+  sms_opt_in_at: string | null;   // timestamptz
+  sms_opt_out: boolean | null;
+  sms_opt_out_at: string | null;  // timestamptz
+  sms_test: boolean | null;
+};
+
 const SUPABASE_URL = process.env.SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
@@ -52,7 +71,10 @@ async function sendMany(e164s: string[], body: string) {
 export async function POST(req: NextRequest) {
   try {
     const json = (await req.json()) as Payload;
-    const body = (json as any).body?.toString?.().trim?.();
+    const body =
+      typeof json.body === 'string' && json.body.trim().length > 0
+        ? json.body.trim()
+        : '';
     if (!body) return NextResponse.json({ error: 'Missing body' }, { status: 400 });
 
     // 1) TEST
@@ -84,7 +106,10 @@ export async function POST(req: NextRequest) {
       if (salonId) base = base.eq('salon_id', salonId);
 
       // Fetch all potential rows, then filter by audience:
-      const { data, error } = await base.not('phone', 'is', null);
+      const { data, error } = await base.not('phone', 'is', null) as {
+        data: CustomerRow[] | null;
+        error: any;
+      };
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
       let phones: string[] = [];
@@ -92,8 +117,8 @@ export async function POST(req: NextRequest) {
       if (json.audience === 'all_opted_in') {
         phones = (data || [])
           .filter((r) => {
-            const inAt = r.sms_opt_in_at ? new Date(r.sms_opt_in_at as any).getTime() : 0;
-            const outAt = r.sms_opt_out_at ? new Date(r.sms_opt_out_at as any).getTime() : 0;
+            const inAt = r.sms_opt_in_at ? new Date(r.sms_opt_in_at).getTime() : 0;
+            const outAt = r.sms_opt_out_at ? new Date(r.sms_opt_out_at).getTime() : 0;
             return (
               r.sms_opt_in === true &&
               inAt > 0 &&
