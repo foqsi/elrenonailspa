@@ -1,29 +1,48 @@
 import { NextResponse } from 'next/server';
 
-const PLACE_ID = process.env.GOOGLE_PLACE_ID!; // e.g., "ChIJ…"
+const PLACE_ID = process.env.GOOGLE_PLACE_ID!;
 const API_KEY = process.env.GOOGLE_MAPS_API_KEY!;
+
+// Google Places Types
+type PlaceReview = {
+  authorAttribution?: {
+    displayName?: string;
+    photoUri?: string;
+    uri?: string;
+  };
+  rating?: number;
+  text?: { text?: string };
+  publishTime?: string;
+};
+
+type PlaceResponse = {
+  displayName?: { text?: string };
+  rating?: number;
+  userRatingCount?: number;
+  googleMapsUri?: string;
+  reviews?: PlaceReview[];
+  attributions?: unknown[];
+};
 
 export async function GET() {
   try {
-    // Fields: rating, total count, reviews (max 5), and a clean Google Maps URL
     const url = `https://places.googleapis.com/v1/places/${PLACE_ID}`;
+
     const res = await fetch(url, {
       headers: {
         'Content-Type': 'application/json',
         'X-Goog-Api-Key': API_KEY,
-        'X-Goog-FieldMask':
-          [
-            'id',
-            'displayName',
-            'rating',
-            'userRatingCount',
-            'reviews',          // up to 5, relevance-sorted
-            'googleMapsUri',
-            'attributions',     // make attributions available
-          ].join(','),
+        'X-Goog-FieldMask': [
+          'id',
+          'displayName',
+          'rating',
+          'userRatingCount',
+          'reviews',
+          'googleMapsUri',
+          'attributions',
+        ].join(','),
       },
-      // Optional: light caching to avoid hammering the API; don’t persist long-term
-      next: { revalidate: 3600 }, // 1 hour
+      next: { revalidate: 3600 },
     });
 
     if (!res.ok) {
@@ -31,16 +50,14 @@ export async function GET() {
       return NextResponse.json({ error: text }, { status: res.status });
     }
 
-    const data = await res.json();
+    const data = (await res.json()) as PlaceResponse;
 
-    // Normalize what your component needs
     const out = {
       name: data.displayName?.text ?? '',
       rating: data.rating ?? null,
       count: data.userRatingCount ?? 0,
       googleMapsUri: data.googleMapsUri ?? '',
-      // Only map the fields you plan to display (don’t alter review text)
-      reviews: (data.reviews ?? []).map((r: any) => ({
+      reviews: (data.reviews ?? []).map((r: PlaceReview) => ({
         author: r.authorAttribution?.displayName ?? 'Google user',
         authorPhoto: r.authorAttribution?.photoUri ?? null,
         authorUri: r.authorAttribution?.uri ?? null,

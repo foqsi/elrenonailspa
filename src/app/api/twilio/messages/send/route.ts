@@ -106,10 +106,10 @@ export async function POST(req: NextRequest) {
       if (salonId) base = base.eq('salon_id', salonId);
 
       // Fetch all potential rows, then filter by audience:
-      const { data, error } = await base.not('phone', 'is', null) as {
-        data: CustomerRow[] | null;
-        error: any;
-      };
+      const result = await base.not('phone', 'is', null);
+
+      const data = result.data as CustomerRow[] | null;
+      const error = result.error;
       if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
       let phones: string[] = [];
