@@ -16,6 +16,8 @@ export default function Footer() {
             <p>
               <i className="fas fa-phone-alt mr-2 text-green-400" />
               <a href="tel:14056665565" className="hover:underline">(405) 666-5565</a>
+              <i className="fas fa-envelope mr-2 text-blue-400" />
+              <a href="mailto:elrenonailspa@gmail.com" className="hover:underline">elrenonailspa@gmail.com</a>
             </p>
 
           </div>
