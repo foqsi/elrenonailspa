@@ -206,9 +206,9 @@ export default function AppointmentForm() {
       setPhoneError('');
     } catch (err) {
       console.error(err);
-
+    
       let message = 'Something went wrong. Please try again.';
-
+    
       if (err?.message) {
         if (err.message.includes('slots')) {
           message = 'That time slot was just booked. Please choose another time.';
@@ -216,8 +216,10 @@ export default function AppointmentForm() {
           message = 'Network issue. Check your connection and try again.';
         } else {
           message = err.message;
-          toast.error(message);
         }
+      }
+
+      toast.error(message);
     } finally {
       setSubmitting(false);
     }
