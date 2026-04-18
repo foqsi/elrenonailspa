@@ -204,12 +204,12 @@ export default function AppointmentForm() {
       setLookupResultNote(null);
       setEmailError('');
       setPhoneError('');
-    } catch (err) {
+    } catch (err: unknown) {
       console.error(err);
     
       let message = 'Something went wrong. Please try again.';
     
-      if (err?.message) {
+      if (err instanceof Error) {
         if (err.message.includes('slots')) {
           message = 'That time slot was just booked. Please choose another time.';
         } else if (err.message.includes('network')) {
