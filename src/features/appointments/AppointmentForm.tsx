@@ -206,7 +206,18 @@ export default function AppointmentForm() {
       setPhoneError('');
     } catch (err) {
       console.error(err);
-      toast.error(err instanceof Error ? err.message : 'Unexpected error.');
+
+      let message = 'Something went wrong. Please try again.';
+
+      if (err?.message) {
+        if (err.message.includes('slots')) {
+          message = 'That time slot was just booked. Please choose another time.';
+        } else if (err.message.includes('network')) {
+          message = 'Network issue. Check your connection and try again.';
+        } else {
+          message = err.message;
+          toast.error(message);
+        }
     } finally {
       setSubmitting(false);
     }
