@@ -147,7 +147,7 @@ export default function AppointmentForm() {
         candidate.setHours(hour, min, 0, 0);
 
         if (isSameDay && candidate <= cutoff) continue;
-        if (!bookedSlots[timeStr] || bookedSlots[timeStr] < 5) {
+        if (!bookedSlots[timeStr] || bookedSlots[timeStr] < 3) {
           times.push(timeStr);
         }
       }
