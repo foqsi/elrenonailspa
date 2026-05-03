@@ -28,6 +28,12 @@ export default function GallerySection() {
       prev !== null ? (prev - 1 + images.length) % images.length : null
     );
 
+  const NoAnimation: React.FC<{ children: React.ReactNode }> = ({ children }) => (
+    <>{children}</>
+  );
+
+  NoAnimation.displayName = 'NoAnimation';
+
   type WrapperProps = {
     children: React.ReactNode;
     delay?: number;
@@ -62,17 +68,15 @@ export default function GallerySection() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
             {images.map((item, index) => {
-              const shouldAnimate = index < 9;
+              const shouldAnimate = index < 6;
 
-              let Wrapper: React.ComponentType<WrapperProps>;
-
-              if (!shouldAnimate) {
-                Wrapper = ({ children }) => <>{children}</>;
-              } else {
-                if (index % 3 === 0) Wrapper = FadeInLeft;
-                else if (index % 3 === 2) Wrapper = FadeInRight;
-                else Wrapper = FadeIn;
-              }
+              const Wrapper: React.ComponentType<WrapperProps> = shouldAnimate
+                ? index % 3 === 0
+                  ? FadeInLeft
+                  : index % 3 === 2
+                    ? FadeInRight
+                    : FadeIn
+                : NoAnimation;
 
               return (
                 <Wrapper key={item.id} delay={index * 0.1}>
