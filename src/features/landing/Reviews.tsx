@@ -41,7 +41,7 @@ export default function Reviews() {
                 {'☆'.repeat(5 - review.rating)}
               </div>
 
-              <p className="text-gray-600 mb-4">"{review.text}"</p>
+              <p className="text-gray-600 mb-4">{`"${review.text}"`}</p>
 
               <p className="font-semibold text-gray-800">
                 - {review.name}

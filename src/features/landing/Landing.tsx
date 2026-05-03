@@ -5,9 +5,9 @@ export default function Landing() {
   return (
     <>
       <Hero />
+      <About />
       <Features />
       {/* <Display /> */}
-      <About />
       <Reviews />
       <CallToAction />
     </>

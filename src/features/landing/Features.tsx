@@ -9,7 +9,7 @@ import FadeInSection from '@/components/animations/FadeUpSection';
 export default function Services() {
   return (
     <FadeInSection delay={0.2}>
-      <section className="py-20 bg-gray-50">
+      <section className="py-20 bg-white">
         <div className="container mx-auto px-4">
           <h2 className="text-3xl font-bold text-center text-red-600 mb-12">
             Our Services
@@ -28,7 +28,7 @@ export default function Services() {
                 title="Pedicures"
                 description="Relaxing treatments for refreshed, healthy feet."
                 image={pedicure}
-                direction="up"
+                direction="right"
                 delay={0.2}
               />
             </Link>
@@ -37,7 +37,7 @@ export default function Services() {
                 title="Nail Art"
                 description="Custom designs that express your unique style."
                 image={nailart}
-                direction="right"
+                direction="left"
                 delay={0.4}
               />
             </Link>
