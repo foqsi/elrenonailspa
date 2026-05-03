@@ -1,4 +1,4 @@
-import '@fortawesome/fontawesome-free/css/all.min.css';
+// import '@fortawesome/fontawesome-free/css/all.min.css';
 
 export default function Footer() {
   return (
@@ -73,7 +73,7 @@ export default function Footer() {
       {/* Bottom line */}
       <div className="mt-12 text-center text-gray-500 text-sm border-t border-gray-700 pt-6">
         &copy; {new Date().getFullYear()} El Reno Nail Spa. All rights reserved.
-        <div className="mt-2 text-xs">
+        {/* <div className="mt-2 text-xs">
           Website by{' '}
           <a
             href="https://simplersalon.com"
@@ -84,7 +84,7 @@ export default function Footer() {
             Simpler Salon
           </a>
           , a one-time-fee web design service.
-        </div>
+        </div> */}
       </div>
 
     </footer>
