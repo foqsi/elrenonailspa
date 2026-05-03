@@ -28,12 +28,12 @@ export default function Video() {
   return (
     <section className="w-full py-12 bg-gradient-to-br from-red-700 via-red-500 to-gray-800">
       <div className="container mx-auto px-2 text-center">
-        {/* <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-white tracking-tight">
+        <h2 className="text-3xl md:text-4xl font-extrabold mb-4 text-white tracking-tight">
           Best Pedicures
         </h2>
         <p className="text-lg text-red-100 mb-10 max-w-lg mx-auto">
           Treat your feet to the ultimate pampering experience.
-        </p> */}
+        </p>
 
         <div className="relative max-w-[400px] mx-auto transition-transform duration-300 hover:scale-[1.02]">
           {/* Video */}

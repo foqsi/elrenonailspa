@@ -2,6 +2,7 @@
 
 import FadeInDown from '@/components/animations/FadeInDown';
 import SlideDown from '@/components/animations/SlideDown';
+import FadeUpSection from '@/components/animations/FadeUpSection';
 
 interface AppointmentFormLayoutProps {
     form: {
@@ -69,172 +70,174 @@ export default function AppointmentFormLayout({
                 </h1>
             </FadeInDown>
 
-            <div className="max-w-xl mx-auto bg-white p-8 shadow-lg rounded-lg">
-                <form className="space-y-6" onSubmit={handleSubmit}>
-                    <p className="text-sm text-gray-700 mb-2 text-center" aria-live="polite">
-                        {introText}
-                    </p>
+            <FadeUpSection>
+                <div className="max-w-xl mx-auto bg-white p-8 shadow-lg rounded-lg">
+                    <form className="space-y-6" onSubmit={handleSubmit}>
+                        <p className="text-sm text-gray-700 mb-2 text-center" aria-live="polite">
+                            {introText}
+                        </p>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Phone <span className="text-red-500">*</span>
-                        </label>
-                        <div className="flex flex-col md:flex-row gap-2">
-                            <input
-                                type="tel"
-                                name="phone"
-                                value={form.phone}
-                                onChange={handleChange}
-                                disabled={customerFound}
-                                className={`w-full border ${phoneError ? 'border-red-500' : 'border-gray-300'} p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300`}
-                                maxLength={14}
-                                required
-                                placeholder="(405) 555-6655"
-                            />
-                            {!showDetails && (
-                                <button
-                                    type="button"
-                                    onClick={onLookup}
-                                    disabled={disabled}
-                                    className={`w-full md:w-auto px-4 py-3 md:py-0 rounded-lg font-semibold whitespace-nowrap ${disabled
-                                        ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                        : 'bg-red-600 text-white hover:bg-red-700'
-                                        }`}
-                                >
-                                    {lookupLoading ? 'Checking…' : 'Continue'}
-                                </button>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                Phone <span className="text-red-500">*</span>
+                            </label>
+                            <div className="flex flex-col md:flex-row gap-2">
+                                <input
+                                    type="tel"
+                                    name="phone"
+                                    value={form.phone}
+                                    onChange={handleChange}
+                                    disabled={customerFound}
+                                    className={`w-full border ${phoneError ? 'border-red-500' : 'border-gray-300'} p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300`}
+                                    maxLength={14}
+                                    required
+                                    placeholder="(405) 555-6655"
+                                />
+                                {!showDetails && (
+                                    <button
+                                        type="button"
+                                        onClick={onLookup}
+                                        disabled={disabled}
+                                        className={`w-full md:w-auto px-4 py-3 md:py-0 rounded-lg font-semibold whitespace-nowrap ${disabled
+                                            ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                            : 'bg-red-600 text-white hover:bg-red-700'
+                                            }`}
+                                    >
+                                        {lookupLoading ? 'Checking…' : 'Continue'}
+                                    </button>
+                                )}
+                            </div>
+                            {phoneError && <p className="text-sm text-red-500 mt-1">{phoneError}</p>}
+                        </div>
+
+                        <SlideDown open={showDetails} className="mt-2" durationMs={1250}>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        First Name <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="firstName"
+                                        value={form.firstName}
+                                        onChange={handleChange}
+                                        disabled={customerFound}
+                                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Last Name <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="lastName"
+                                        value={form.lastName}
+                                        onChange={handleChange}
+                                        disabled={customerFound}
+                                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="mt-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    Email <span className="text-gray-400 text-sm">(optional: for confirmations)</span>
+                                </label>
+                                <input
+                                    type="email"
+                                    name="email"
+                                    value={form.email}
+                                    onChange={handleChange}
+                                    disabled={customerFound}
+                                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+                                />
+                                {emailError && <p className="text-sm text-red-500 mt-1">{emailError}</p>}
+                            </div>
+
+                            {customerFound && (
+                                <p className="mt-3 text-xs text-gray-600 italic text-center" role="note" aria-live="polite">
+                                    If any of the above information is incorrect, please let our staff know to update it.
+                                </p>
                             )}
-                        </div>
-                        {phoneError && <p className="text-sm text-red-500 mt-1">{phoneError}</p>}
-                    </div>
 
-                    <SlideDown open={showDetails} className="mt-2" durationMs={1250}>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <div>
+
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Preferred Date <span className="text-red-500">*</span>
+                                    </label>
+                                    <input
+                                        type="date"
+                                        name="date"
+                                        value={form.date}
+                                        onChange={handleChange}
+                                        min={minDate}
+                                        max={maxDate}
+                                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                                        Preferred Time <span className="text-red-500">*</span>
+                                    </label>
+                                    <select
+                                        name="time"
+                                        value={form.time}
+                                        onChange={handleChange}
+                                        disabled={!form.date}
+                                        className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
+                                        required
+                                    >
+                                        <option value="">Select a time</option>
+                                        {getAvailableTimes().map((time) => (
+                                            <option key={time} value={time}>
+                                                {formatTime(time)}
+                                            </option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="mt-4">
                                 <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    First Name <span className="text-red-500">*</span>
+                                    Preferred Tech <span className="text-gray-400 text-sm">(optional)</span>
                                 </label>
                                 <input
                                     type="text"
-                                    name="firstName"
-                                    value={form.firstName}
+                                    name="tech"
+                                    value={form.tech}
                                     onChange={handleChange}
-                                    disabled={customerFound}
                                     className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
-                                    required
                                 />
                             </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Last Name <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="text"
-                                    name="lastName"
-                                    value={form.lastName}
+
+                            <div className="mt-4">
+                                <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
+                                <textarea
+                                    name="message"
+                                    value={form.message}
                                     onChange={handleChange}
-                                    disabled={customerFound}
-                                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
-                                    required
+                                    className="w-full border border-gray-300 p-3 rounded-lg h-28 resize-none focus:outline-none focus:ring-2 focus:ring-red-300"
+                                    placeholder="Let us know what you'd like done during your visit."
                                 />
                             </div>
-                        </div>
 
-                        <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Email <span className="text-gray-400 text-sm">(optional: for confirmations)</span>
-                            </label>
-                            <input
-                                type="email"
-                                name="email"
-                                value={form.email}
-                                onChange={handleChange}
-                                disabled={customerFound}
-                                className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
-                            />
-                            {emailError && <p className="text-sm text-red-500 mt-1">{emailError}</p>}
-                        </div>
-
-                        {customerFound && (
-                            <p className="mt-3 text-xs text-gray-600 italic text-center" role="note" aria-live="polite">
-                                If any of the above information is incorrect, please let our staff know to update it.
-                            </p>
-                        )}
-
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Preferred Date <span className="text-red-500">*</span>
-                                </label>
-                                <input
-                                    type="date"
-                                    name="date"
-                                    value={form.date}
-                                    onChange={handleChange}
-                                    min={minDate}
-                                    max={maxDate}
-                                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
-                                    required
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">
-                                    Preferred Time <span className="text-red-500">*</span>
-                                </label>
-                                <select
-                                    name="time"
-                                    value={form.time}
-                                    onChange={handleChange}
-                                    disabled={!form.date}
-                                    className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
-                                    required
-                                >
-                                    <option value="">Select a time</option>
-                                    {getAvailableTimes().map((time) => (
-                                        <option key={time} value={time}>
-                                            {formatTime(time)}
-                                        </option>
-                                    ))}
-                                </select>
-                            </div>
-                        </div>
-
-                        <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                                Preferred Tech <span className="text-gray-400 text-sm">(optional)</span>
-                            </label>
-                            <input
-                                type="text"
-                                name="tech"
-                                value={form.tech}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-300"
-                            />
-                        </div>
-
-                        <div className="mt-4">
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Message</label>
-                            <textarea
-                                name="message"
-                                value={form.message}
-                                onChange={handleChange}
-                                className="w-full border border-gray-300 p-3 rounded-lg h-28 resize-none focus:outline-none focus:ring-2 focus:ring-red-300"
-                                placeholder="Let us know what you'd like done during your visit."
-                            />
-                        </div>
-
-                        <button
-                            type="submit"
-                            disabled={!formValid}
-                            className={`mt-6 w-full py-3 rounded-lg font-semibold transition ${formValid ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                                }`}
-                        >
-                            {submitting ? 'Sending…' : 'Submit Appointment'}
-                        </button>
-                    </SlideDown>
-                </form>
-            </div>
+                            <button
+                                type="submit"
+                                disabled={!formValid}
+                                className={`mt-6 w-full py-3 rounded-lg font-semibold transition ${formValid ? 'bg-red-600 text-white hover:bg-red-700' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                                    }`}
+                            >
+                                {submitting ? 'Sending…' : 'Submit Appointment'}
+                            </button>
+                        </SlideDown>
+                    </form>
+                </div>
+            </FadeUpSection>
         </main>
     );
 }
