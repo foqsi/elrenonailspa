@@ -1,4 +1,5 @@
-import { Hero, Features, Testimonials, About, CallToAction, } from './';
+import { Hero, Features, About, CallToAction, } from './';
+import Reviews from './Reviews';
 
 export default function Landing() {
   return (
@@ -7,7 +8,7 @@ export default function Landing() {
       <Features />
       {/* <Display /> */}
       <About />
-      <Testimonials />
+      <Reviews />
       <CallToAction />
     </>
   );
