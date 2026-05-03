@@ -7,7 +7,6 @@ import FadeIn from '@/components/animations/FadeIn';
 import FadeInLeft from '@/components/animations/FadeInLeft';
 import FadeInRight from '@/components/animations/FadeInRight';
 import FadeInDown from '@/components/animations/FadeInDown';
-import Throbber from '@/components/Throbber';
 
 export default function GallerySection() {
   const [images, setImages] = useState<GalleryItem[]>([]);
@@ -29,13 +28,6 @@ export default function GallerySection() {
       prev !== null ? (prev - 1 + images.length) % images.length : null
     );
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Throbber size={48} />
-      </div>
-    );
-  }
 
   return (
     <section className="pt-20 bg-white">
@@ -46,36 +38,62 @@ export default function GallerySection() {
           </h1>
         </FadeInDown>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {images.map((item, index) => {
-            let Wrapper;
-            if (index % 3 === 0) Wrapper = FadeInLeft;
-            else if (index % 3 === 2) Wrapper = FadeInRight;
-            else Wrapper = FadeIn;
-
-            return (
-              <Wrapper key={item.id} delay={index * 0.1}>
+        {loading ? (
+          <div className="animate-pulse">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+              {Array.from({ length: 9 }).map((_, index) => (
                 <div
-                  className="rounded-lg shadow-md overflow-hidden cursor-pointer bg-white"
-                  onClick={() => openModal(index)}
+                  key={index}
+                  className="rounded-lg shadow-md overflow-hidden bg-white"
                 >
-                  <img
-                    src={item.image_url}
-                    alt={item.caption ?? 'Gallery image'}
-                    title="Work by El Reno Nail Spa"
-                    className="w-full max-h-[500px] object-contain bg-gray-100"
-                    onContextMenu={(e) => e.preventDefault()}
-                  />
-                  {item.caption && (
-                    <div className="p-4 text-gray-700 text-center text-sm">
-                      {item.caption}
-                    </div>
-                  )}
+                  <div className="w-full h-[300px] bg-gray-200" />
+                  <div className="p-4">
+                    <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2" />
+                    <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto" />
+                  </div>
                 </div>
-              </Wrapper>
-            );
-          })}
-        </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+            {images.map((item, index) => {
+              const shouldAnimate = index < 9;
+
+              let Wrapper;
+
+              if (!shouldAnimate) {
+                Wrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+              } else {
+                if (index % 3 === 0) Wrapper = FadeInLeft;
+                else if (index % 3 === 2) Wrapper = FadeInRight;
+                else Wrapper = FadeIn;
+              }
+
+              return (
+                <Wrapper key={item.id} delay={index * 0.1}>
+                  <div
+                    className="rounded-lg shadow-md overflow-hidden cursor-pointer bg-white"
+                    onClick={() => openModal(index)}
+                  >
+                    <img
+                      src={item.image_url}
+                      alt={item.caption ?? 'Gallery image'}
+                      title="Work by El Reno Nail Spa"
+                      className="w-full max-h-[500px] object-contain bg-gray-100"
+                      onContextMenu={(e) => e.preventDefault()}
+                    />
+                    {item.caption && (
+                      <div className="p-4 text-gray-700 text-center text-sm">
+                        {item.caption}
+                      </div>
+                    )}
+                  </div>
+                </Wrapper>
+              );
+            })}
+          </div>
+        )}
 
         <p className="text-center text-sm text-gray-500 mt-10 max-w-2xl mx-auto">
           <em>
@@ -87,6 +105,7 @@ export default function GallerySection() {
         </p>
       </div>
 
+      {/* Modal */}
       {activeIndex !== null && (
         <div
           className="fixed inset-0 bg-black bg-opacity-80 z-[9999] flex items-center justify-center px-4"
