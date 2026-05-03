@@ -1,4 +1,4 @@
-import { Hero, Features, Testimonials, About, CallToAction, Display } from './';
+import { Hero, Features, Testimonials, About, CallToAction, } from './';
 
 export default function Landing() {
   return (
