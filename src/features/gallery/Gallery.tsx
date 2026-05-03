@@ -60,7 +60,7 @@ export default function GallerySection() {
             {images.map((item, index) => {
               const shouldAnimate = index < 9;
 
-              let Wrapper;
+              let Wrapper: any;
 
               if (!shouldAnimate) {
                 Wrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;
