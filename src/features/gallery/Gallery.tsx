@@ -28,6 +28,10 @@ export default function GallerySection() {
       prev !== null ? (prev - 1 + images.length) % images.length : null
     );
 
+  type WrapperProps = {
+    children: React.ReactNode;
+    delay?: number;
+  };
 
   return (
     <section className="pt-20 bg-white">
@@ -60,10 +64,10 @@ export default function GallerySection() {
             {images.map((item, index) => {
               const shouldAnimate = index < 9;
 
-              let Wrapper: any;
+              let Wrapper: React.ComponentType<WrapperProps>;
 
               if (!shouldAnimate) {
-                Wrapper = ({ children }: { children: React.ReactNode }) => <>{children}</>;
+                Wrapper = ({ children }) => <>{children}</>;
               } else {
                 if (index % 3 === 0) Wrapper = FadeInLeft;
                 else if (index % 3 === 2) Wrapper = FadeInRight;
