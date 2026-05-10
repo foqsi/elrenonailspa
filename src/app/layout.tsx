@@ -2,7 +2,7 @@ import { Metadata } from 'next';
 import './globals.css';
 import { Navbar, Footer, PromoBanner } from '@/layouts';
 import { Toaster } from 'react-hot-toast';
-
+// Comment
 export const metadata: Metadata = {
   title: {
     default: 'El Reno Nail Spa',
