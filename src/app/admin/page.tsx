@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import type { IconType } from 'react-icons';
 import {
   FaBullhorn,
+  FaCalendarCheck,
   FaChevronUp,
   FaConciergeBell,
   FaImages,

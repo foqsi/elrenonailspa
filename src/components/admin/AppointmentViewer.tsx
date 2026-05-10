@@ -98,47 +98,49 @@ export default function AppointmentsViewer() {
       ) : (
         Object.entries(groupedByDate).map(([date, appts]) => (
           <div key={date}>
-            <h3 className="text-lg font-bold mb-4 text-gray-800">{date}</h3>
+            <h3 className="text-xl font-bold mb-6 text-gray-900 pb-3 border-b-2 border-red-200">
+              📅 {new Date(date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
+            </h3>
 
             {/* Table for larger screens */}
-            <div className="hidden sm:block overflow-x-auto">
-              <table className="w-full text-sm border border-gray-300 min-w-[600px]">
-                <thead className="bg-red-100 text-left">
+            <div className="hidden sm:block overflow-x-auto rounded-2xl border-2 border-red-100 shadow-lg">
+              <table className="w-full text-sm min-w-[600px]">
+                <thead className="bg-gradient-to-r from-red-600 to-red-700 text-white sticky top-0">
                   <tr>
-                    <th className="w-[80px] p-2 border text-center">Actions</th>
-                    <th className="w-[100px] p-2 border">Time</th>
-                    <th className="w-[150px] p-2 border">Name</th>
-                    <th className="w-[140px] p-2 border">Phone</th>
-                    <th className="w-[100px] p-2 border">Tech</th>
-                    <th className="w-auto p-2 border">Message</th>
+                    <th className="w-[80px] p-4 text-center font-bold">Actions</th>
+                    <th className="w-[100px] p-4 text-left font-bold">Time</th>
+                    <th className="w-[150px] p-4 text-left font-bold">Name</th>
+                    <th className="w-[140px] p-4 text-left font-bold">Phone</th>
+                    <th className="w-[100px] p-4 text-left font-bold">Tech</th>
+                    <th className="w-auto p-4 text-left font-bold">Message</th>
 
                   </tr>
                 </thead>
                 <tbody>
-                  {appts.map((appt) => (
-                    <tr key={appt.id} className="hover:bg-red-50">
-                      <td className="p-2 border text-center">
+                  {appts.map((appt, idx) => (
+                    <tr key={appt.id} className={`border-t border-gray-100 transition-colors ${idx % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-red-50`}>
+                      <td className="p-4 text-center">
                         <button
                           onClick={() => setConfirmId(appt.id)}
-                          className="bg-red-500 text-white text-xs px-3 py-1 rounded hover:bg-red-600 transition"
+                          className="bg-red-500 hover:bg-red-600 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg"
                         >
                           Delete
                         </button>
                       </td>
-                      <td className="p-2 border whitespace-nowrap">{appt.time}</td>
-                      <td className="p-2 border">
+                      <td className="p-4 whitespace-nowrap font-semibold text-gray-900">{appt.time}</td>
+                      <td className="p-4 font-medium text-gray-900">
                         {appt.first_name} {appt.last_name}
                       </td>
-                      <td className="p-2 border">
+                      <td className="p-4">
                         <a
                           href={`tel:${appt.phone}`}
-                          className="text-blue-600 underline hover:text-blue-800"
+                          className="text-red-600 font-medium hover:text-red-700 underline"
                         >
                           {appt.phone}
                         </a>
                       </td>
-                      <td className="p-2 border">{appt.tech}</td>
-                      <td className="p-2 border text-sm text-gray-700 break-words whitespace-pre-wrap max-w-md">
+                      <td className="p-4 text-gray-700">{appt.tech}</td>
+                      <td className="p-4 text-sm text-gray-700 break-words whitespace-pre-wrap max-w-md">
                         {appt.message ? (
                           <>
                             {expandedRows.has(appt.id)
@@ -149,7 +151,7 @@ export default function AppointmentsViewer() {
                             {appt.message.length > 80 && (
                               <button
                                 onClick={() => toggleRowExpansion(appt.id)}
-                                className="ml-2 text-blue-600 underline text-xs"
+                                className="ml-2 text-red-600 underline text-xs font-semibold hover:text-red-700"
                               >
                                 {expandedRows.has(appt.id) ? 'Show less' : 'Show more'}
                               </button>
@@ -168,49 +170,51 @@ export default function AppointmentsViewer() {
             {/* Card layout for mobile */}
             <div className="sm:hidden space-y-4">
               {appts.map((appt) => (
-                <div key={appt.id} className="border rounded p-4 bg-white shadow-sm">
-                  <div className="flex justify-between mb-2">
-                    <div className="text-lg text-red-600">{appt.time}</div>
+                <div key={appt.id} className="border-2 border-red-100 rounded-xl p-5 bg-gradient-to-br from-white to-red-50 shadow-md hover:shadow-lg transition-all">
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="text-2xl font-bold text-red-600">{appt.time}</div>
                     <button
                       onClick={() => setConfirmId(appt.id)}
-                      className="text-red-600 text-xs font-semibold hover:underline"
+                      className="bg-red-600 hover:bg-red-700 text-white text-xs font-semibold px-3 py-2 rounded-lg transition-all"
                     >
                       Delete
                     </button>
                   </div>
-                  <div className="text-base font-semibold text-gray-800 mb-1">
+                  <div className="text-lg font-bold text-gray-900 mb-3">
                     {appt.first_name} {appt.last_name}
                   </div>
-                  <div className="text-sm text-gray-600 mb-1">
-                    <span className="font-medium">Phone:</span>{' '}
-                    <a href={`tel:${appt.phone}`} className="text-blue-600 underline">
-                      {appt.phone}
-                    </a>
-                  </div>
-                  <div className="text-sm text-gray-600 mb-1">
-                    <span className="font-medium">Tech:</span> {appt.tech}
-                  </div>
-                  <div className="text-sm text-gray-700 whitespace-pre-wrap">
-                    <span className="font-medium">Message:</span>{' '}
-                    {appt.message ? (
-                      <>
-                        {expandedRows.has(appt.id)
-                          ? appt.message
-                          : appt.message.length > 80
-                            ? `${appt.message.slice(0, 80)}...`
-                            : appt.message}
-                        {appt.message.length > 80 && (
-                          <button
-                            onClick={() => toggleRowExpansion(appt.id)}
-                            className="ml-1 text-blue-600 underline text-xs"
-                          >
-                            {expandedRows.has(appt.id) ? 'Show less' : 'Show more'}
-                          </button>
-                        )}
-                      </>
-                    ) : (
-                      <span className="italic text-gray-400">No message</span>
-                    )}
+                  <div className="space-y-2">
+                    <div className="text-sm text-gray-700">
+                      <span className="font-bold text-gray-900">📞 Phone:</span>{' '}
+                      <a href={`tel:${appt.phone}`} className="text-red-600 font-semibold underline">
+                        {appt.phone}
+                      </a>
+                    </div>
+                    <div className="text-sm text-gray-700">
+                      <span className="font-bold text-gray-900">💅 Tech:</span> {appt.tech}
+                    </div>
+                    <div className="text-sm text-gray-700 bg-white rounded-lg p-3 border border-gray-200">
+                      <span className="font-bold text-gray-900">💬 Message:</span>{' '}
+                      {appt.message ? (
+                        <>
+                          {expandedRows.has(appt.id)
+                            ? appt.message
+                            : appt.message.length > 80
+                              ? `${appt.message.slice(0, 80)}...`
+                              : appt.message}
+                          {appt.message.length > 80 && (
+                            <button
+                              onClick={() => toggleRowExpansion(appt.id)}
+                              className="ml-1 text-red-600 underline text-xs font-semibold hover:text-red-700"
+                            >
+                              {expandedRows.has(appt.id) ? 'Show less' : 'Show more'}
+                            </button>
+                          )}
+                        </>
+                      ) : (
+                        <span className="italic text-gray-400">No message</span>
+                      )}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -221,24 +225,25 @@ export default function AppointmentsViewer() {
 
       {/* Modal */}
       {confirmId && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4">
-          <div className="bg-white rounded-lg shadow-lg max-w-sm w-full p-6 text-center">
-            <h4 className="text-lg font-semibold text-gray-800 mb-4">Delete Appointment?</h4>
-            <p className="text-sm text-gray-600 mb-6">This action cannot be undone.</p>
-            <div className="flex justify-center gap-4">
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-sm w-full p-8 text-center border-2 border-red-100">
+            <div className="text-4xl mb-4">⚠️</div>
+            <h4 className="text-2xl font-bold text-gray-900 mb-3">Delete Appointment?</h4>
+            <p className="text-gray-600 mb-8">This action cannot be undone.</p>
+            <div className="flex flex-col sm:flex-row justify-center gap-3">
               <button
                 onClick={() => handleDelete(confirmId)}
                 disabled={deleting}
-                className={`px-4 py-2 rounded text-white ${deleting
-                  ? 'bg-gray-400 cursor-not-allowed'
-                  : 'bg-red-600 hover:bg-red-700'
+                className={`px-6 py-3 rounded-lg font-bold transition-all ${deleting
+                  ? 'bg-gray-400 text-gray-600 cursor-not-allowed'
+                  : 'bg-red-600 hover:bg-red-700 text-white hover:shadow-lg'
                   }`}
               >
                 {deleting ? 'Deleting...' : 'Yes, Delete'}
               </button>
               <button
                 onClick={() => setConfirmId(null)}
-                className="bg-gray-200 text-gray-700 px-4 py-2 rounded hover:bg-gray-300"
+                className="bg-gray-200 hover:bg-gray-300 text-gray-900 px-6 py-3 rounded-lg font-bold transition-all"
               >
                 Cancel
               </button>

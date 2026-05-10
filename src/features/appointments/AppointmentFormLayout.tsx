@@ -304,10 +304,10 @@ export default function AppointmentFormLayout({
                                 Contact Us
                             </a>
                             <button
-                                onClick={() => window.location.href = 'tel:+1-405-555-0123'}
+                                onClick={() => window.location.href = 'tel:+1-405-666-5565'}
                                 className="inline-block border-2 border-white text-white hover:bg-white hover:text-red-600 font-bold py-4 px-8 rounded-lg transition-colors"
                             >
-                                Call (405) 555-0123
+                                Call (405) 666-5565
                             </button>
                         </div>
                     </div>
