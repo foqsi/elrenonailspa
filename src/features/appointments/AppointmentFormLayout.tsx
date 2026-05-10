@@ -83,7 +83,7 @@ export default function AppointmentFormLayout({
 
             <div className="max-w-5xl mx-auto">
                 {/* Info Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
                     <FadeInLeft>
                         <div className="bg-gradient-to-br from-red-50 to-pink-50 p-6 rounded-2xl border-2 border-red-200 hover:shadow-lg transition-shadow">
                             <div className="text-4xl mb-3">✨</div>
@@ -91,13 +91,13 @@ export default function AppointmentFormLayout({
                             <p className="text-gray-700 text-sm">Book in minutes with our simple online form</p>
                         </div>
                     </FadeInLeft>
-                    <FadeInUp>
+                    {/* <FadeInUp>
                         <div className="bg-gradient-to-br from-rose-50 to-red-50 p-6 rounded-2xl border-2 border-red-200 hover:shadow-lg transition-shadow">
                             <div className="text-4xl mb-3">📅</div>
                             <h3 className="text-lg font-bold text-gray-900 mb-2">Real-Time Availability</h3>
                             <p className="text-gray-700 text-sm">See available times instantly and pick what works</p>
                         </div>
-                    </FadeInUp>
+                    </FadeInUp> */}
                     <FadeInRight>
                         <div className="bg-gradient-to-br from-pink-50 to-rose-50 p-6 rounded-2xl border-2 border-red-200 hover:shadow-lg transition-shadow">
                             <div className="text-4xl mb-3">💳</div>
