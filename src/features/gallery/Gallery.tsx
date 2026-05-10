@@ -146,7 +146,7 @@ export default function GallerySection() {
         {/* Bottom CTA */}
         <FadeInUp>
           <div className="bg-gradient-to-r from-gray-900 via-red-900 to-gray-900 rounded-2xl p-12 shadow-xl text-center text-white">
-            <h3 className="text-3xl font-bold mb-4">Inspired? Let's Create Your Look</h3>
+            <h3 className="text-3xl font-bold mb-4">Inspired? Let&apos;s Create Your Look</h3>
             <p className="text-gray-300 mb-6 max-w-2xl mx-auto">
               Bring these designs to life or create something uniquely yours.
               Book your appointment today and let our experts transform your nails.

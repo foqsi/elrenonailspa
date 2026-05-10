@@ -75,8 +75,8 @@ export default function AppointmentFormLayout({
                     </div>
                     <h1 className="text-6xl font-bold text-gray-900 mb-6">Schedule Your Appointment</h1>
                     <p className="text-xl text-gray-600 leading-relaxed">
-                        Choose your preferred date and time, and we'll take care of the rest.
-                        It's quick, easy, and takes just a few minutes.
+                        Choose your preferred date and time, and we&apos;ll take care of the rest.
+                        It&apos;s quick, easy, and takes just a few minutes.
                     </p>
                 </div>
             </FadeInDown>

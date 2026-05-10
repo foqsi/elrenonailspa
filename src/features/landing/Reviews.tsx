@@ -44,7 +44,7 @@ export default function Reviews() {
             What Our Clients Say
           </h2>
           <p className="text-lg text-gray-600">
-            Don't just take our word for it — hear from our happy customers
+            Don&apos;t just take our word for it — hear from our happy customers
           </p>
         </div>
 

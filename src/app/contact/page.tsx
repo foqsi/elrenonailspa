@@ -49,10 +49,10 @@ export default function ContactPage() {
           <div className="inline-block mb-4 px-4 py-2 bg-red-100 rounded-full">
             <span className="text-red-600 font-semibold text-sm">GET IN TOUCH</span>
           </div>
-          <h1 className="text-6xl font-bold text-gray-900 mb-6">Let's Connect</h1>
+          <h1 className="text-6xl font-bold text-gray-900 mb-6">Let&apos;s Connect</h1>
           <p className="text-xl text-gray-600 leading-relaxed">
             Have questions about our services? Want to book a special appointment?
-            We're here to help and can't wait to pamper you.
+            We&apos;re here to help and can&apos;t wait to pamper you.
           </p>
         </div>
       </FadeInDown>
@@ -68,7 +68,7 @@ export default function ContactPage() {
               {submitted && (
                 <div className="mb-6 p-4 bg-green-50 border-l-4 border-green-500 text-green-700 rounded">
                   <p className="font-semibold">Success!</p>
-                  <p className="text-sm">We've received your message and will respond soon.</p>
+                  <p className="text-sm">We&apos;ve received your message and will respond soon.</p>
                 </div>
               )}
 
@@ -228,7 +228,7 @@ export default function ContactPage() {
               <div>
                 <h3 className="text-3xl font-bold text-white mb-3">Ready to Treat Yourself?</h3>
                 <p className="text-gray-300 text-lg">
-                  Book your appointment online or give us a call. We'll take care of you from the moment you walk in.
+                  Book your appointment online or give us a call. We&apos;ll take care of you from the moment you walk in.
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-4 justify-center md:justify-end">
