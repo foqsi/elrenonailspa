@@ -12,6 +12,17 @@ export default function GallerySection() {
   const [images, setImages] = useState<GalleryItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   useEffect(() => {
     fetchGallery().then((data) => {
@@ -50,25 +61,21 @@ export default function GallerySection() {
 
         {loading ? (
           <div className="animate-pulse">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-              {Array.from({ length: 9 }).map((_, index) => (
+            <div className="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-3 gap-2 sm:gap-4 md:gap-6">
+              {Array.from({ length: 12 }).map((_, index) => (
                 <div
                   key={index}
                   className="rounded-lg shadow-md overflow-hidden bg-white"
                 >
-                  <div className="w-full h-[300px] bg-gray-200" />
-                  <div className="p-4">
-                    <div className="h-4 bg-gray-200 rounded w-3/4 mx-auto mb-2" />
-                    <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto" />
-                  </div>
+                  <div className="w-full h-[120px] sm:h-[200px] md:h-[300px] bg-gray-200" />
                 </div>
               ))}
             </div>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-4 sm:grid-cols-3 md:grid-cols-3 gap-2 sm:gap-4 md:gap-6">
             {images.map((item, index) => {
-              const shouldAnimate = index < 6;
+              const shouldAnimate = !isMobile && index < 6;
 
               const Wrapper: React.ComponentType<WrapperProps> = shouldAnimate
                 ? index % 3 === 0
@@ -81,18 +88,18 @@ export default function GallerySection() {
               return (
                 <Wrapper key={item.id} delay={index * 0.1}>
                   <div
-                    className="rounded-lg shadow-md overflow-hidden cursor-pointer bg-white"
+                    className="rounded-lg shadow-md overflow-hidden cursor-pointer bg-white hover:shadow-lg transition-shadow"
                     onClick={() => openModal(index)}
                   >
                     <img
                       src={item.image_url}
                       alt={item.caption ?? 'Gallery image'}
                       title="Work by El Reno Nail Spa"
-                      className="w-full max-h-[500px] object-contain bg-gray-100"
+                      className="w-full h-[120px] sm:h-[200px] md:h-[300px] object-cover bg-gray-100"
                       onContextMenu={(e) => e.preventDefault()}
                     />
                     {item.caption && (
-                      <div className="p-4 text-gray-700 text-center text-sm">
+                      <div className="p-1 sm:p-3 text-gray-700 text-center text-xs sm:text-sm line-clamp-2">
                         {item.caption}
                       </div>
                     )}
@@ -116,45 +123,49 @@ export default function GallerySection() {
       {/* Modal */}
       {activeIndex !== null && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-80 z-[9999] flex items-center justify-center px-4"
+          className="fixed inset-0 bg-black bg-opacity-80 z-[9999] flex items-center justify-center px-2 sm:px-4 py-4"
           onClick={closeModal}
         >
           <div
-            className="relative max-w-4xl w-full"
+            className="relative w-full max-w-2xl sm:max-w-4xl"
             onClick={(e) => e.stopPropagation()}
           >
             <button
               onClick={closeModal}
-              className="absolute top-4 right-4 text-white text-2xl font-bold"
+              className="absolute -top-10 right-0 sm:top-4 sm:right-4 text-white text-3xl sm:text-4xl font-bold hover:scale-110 transition"
+              aria-label="Close modal"
             >
               &times;
             </button>
             <img
               src={images[activeIndex].image_url}
               alt={images[activeIndex].caption ?? ''}
-              className="w-full max-h-[80vh] object-contain rounded"
+              className="w-full max-h-[70vh] sm:max-h-[80vh] object-contain rounded"
               onContextMenu={(e) => e.preventDefault()}
             />
             {images[activeIndex].caption && (
-              <div className="text-white text-center mt-4 text-sm">
+              <div className="text-white text-center mt-3 sm:mt-4 text-xs sm:text-sm px-2">
                 {images[activeIndex].caption}
               </div>
             )}
-            <div className="absolute top-1/2 left-4 transform -translate-y-1/2">
-              <button
-                onClick={prev}
-                className="text-white text-3xl font-bold hover:scale-125 transition"
-              >
-                &#8592;
-              </button>
-            </div>
-            <div className="absolute top-1/2 right-4 transform -translate-y-1/2">
-              <button
-                onClick={next}
-                className="text-white text-3xl font-bold hover:scale-125 transition"
-              >
-                &#8594;
-              </button>
+            {/* Navigation buttons */}
+            <button
+              onClick={prev}
+              className="absolute top-1/2 left-2 sm:left-4 transform -translate-y-1/2 text-white text-2xl sm:text-4xl font-bold hover:scale-125 transition bg-black bg-opacity-50 rounded-full p-2 sm:p-3"
+              aria-label="Previous image"
+            >
+              &#8592;
+            </button>
+            <button
+              onClick={next}
+              className="absolute top-1/2 right-2 sm:right-4 transform -translate-y-1/2 text-white text-2xl sm:text-4xl font-bold hover:scale-125 transition bg-black bg-opacity-50 rounded-full p-2 sm:p-3"
+              aria-label="Next image"
+            >
+              &#8594;
+            </button>
+            {/* Image counter */}
+            <div className="text-white text-center mt-3 sm:mt-4 text-xs sm:text-sm">
+              {activeIndex + 1} / {images.length}
             </div>
           </div>
         </div>
