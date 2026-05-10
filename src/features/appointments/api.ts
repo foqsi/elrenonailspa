@@ -154,12 +154,9 @@ export async function submitAppointment(form: AppointmentFormData) {
 
   if (error || status >= 400) throw new Error(error?.message || 'Failed to insert');
 
-  // ---- NEW: bump customers.last_visit to the scheduled visit datetime ----
-  // Build a local Date from date (YYYY-MM-DD) + time (HH:MM:SS), then to ISO.
   const visitLocal = new Date(`${form.date}T${selectedTime}`);
   const visitISO = visitLocal.toISOString();
 
-  // Only update if it's newer than what's stored (or if null)
   await supabase
     .from('customers')
     .update({ last_visit: visitISO })
