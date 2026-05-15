@@ -89,6 +89,12 @@ export default function AppointmentsViewer() {
     return acc;
   }, {});
 
+  const formatDateString = (dateStr: string) => {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    const date = new Date(year, month - 1, day);
+    return date.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' });
+  };
+
   return (
     <div className="space-y-8">
       {loading ? (
@@ -99,7 +105,7 @@ export default function AppointmentsViewer() {
         Object.entries(groupedByDate).map(([date, appts]) => (
           <div key={date}>
             <h3 className="text-xl font-bold mb-6 text-gray-900 pb-3 border-b-2 border-red-200">
-              📅 {new Date(date).toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric', year: 'numeric' })}
+              📅 {formatDateString(date)}
             </h3>
 
             {/* Table for larger screens */}
